@@ -47,75 +47,69 @@ crystalSi02 = CrystalSiPrecalc(
     hkl=(1, 1, 1),
     t=2.,
     geom=r"Laue reflection",
-    name=r"cr1",
+    name=r"cr2",
     useTT=True)
 
 class SKIF15(raycing.BeamLine):
     def __init__(self):
-        beamLine = raycing.BeamLine()
+        raycing.BeamLine.__init__(self)
+        self.name = r"SKIF_1_5"
 
         self.wiggler01 = rsources.Wiggler(
-            bl=beamLine,
+            bl=self,
             nrays=100000,
             center=[0, 0, 0],
-            eE=3,
-            eI=0.4,
-            eEspread=0.00135,
-            eEpsilonX=0.09586,
-            eEpsilonZ=0.009586,
-            xPrimeMax=1.1,
-            zPrimeMax=0.11,
-            eMin=149900,  # 29900
-            eMax=150100,  # 30100
-            K=20.1685,
-            period=48,
-            n=18
+            eMin=100000,
+            eMax=170000,
+            xPrimeMax=front_end_h_angle * .505e3,
+            zPrimeMax=front_end_v_angle * .505e3,
+            **ring_kwargs,
+            **wiggler_1_5_kwargs
         )
 
-        beamLine.rectangularAperture01 = rapts.RectangularAperture(
-            bl=beamLine,
+        self.rectangularAperture01 = rapts.RectangularAperture(
+            bl=self,
             name=r"Front End Slit",
-            center=[0, 15000, 0],
-            opening=[-15, 15, -1.5, 1.5])
+            center=[0, front_end_distance, 0],
+            opening=front_end_opening)
 
-        beamLine.bentLaueCylinder01 = BentLaueCylinder(
-            bl=beamLine,
+        self.bentLaueCylinder01 = BentLaueCylinder(
+            bl=self,
             name=r"Si[111] Crystal 1",
-            center=[0, 33500, 0],
+            center=[0, monochromator_distance, monochromator_z_offset],
             alpha=np.radians(35.3),
             pitch=2.252849714,
             material=crystalSi01,
-            limOptX=[-100.0, 100.0],
-            limOptY=[-10.0, 10.0],
+            limOptX=monochromator_x_lim ,
+            limOptY=monochromator_y_lim,
             targetOpenCL='CPU',
             R=np.inf)
-        beamLine.bentLaueCylinder01.ucl=mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
 
-        beamLine.screen02 = rscreens.Screen(
-            bl=beamLine,
+        self.screen02 = rscreens.Screen(
+            bl=self,
             name=r"Crystal 1-2 Monitor",
             center=[0, 33500, 12.5])
 
-        beamLine.bentLaueCylinder02 = BentLaueCylinder(
-            bl=beamLine,
+        self.bentLaueCylinder02 = BentLaueCylinder(
+            bl=self,
             name=r"Si[111] Crystal 2",
             center=[0, 33688, 25],
             pitch=2.120945392,
             positionRoll=np.pi,
             material=crystalSi02,
             alpha=np.radians(35.3),
-            limOptX=[-100.0, 100.0],
-            limOptY=[-10.0, 10.0],
+            limOptX=monochromator_x_lim,
+            limOptY=monochromator_y_lim,
             targetOpenCL='CPU',
             R=np.inf)
 
-        beamLine.screen01 = rscreens.Screen(
-            bl=beamLine,
-            name=r"Exit Monitor",
-            center=[0, 114990, 25])
+        self.screen01 = rscreens.Screen(
+            bl=self,
+            name=r"Crystal 1-2 Monitor",
+            center=[0, monochromator_distance, .5 * monochromator_z_offset])
 
-        beamLine.rectangularAperture02 = rapts.RectangularAperture(
-            bl=beamLine,
+        self.rectangularAperture02 = rapts.RectangularAperture(
+            bl=self,
             name=r"Exit Slits",
             center=[0, 111500, 25],
             opening=[-107.5, 107.5, -10, 10])
@@ -163,7 +157,7 @@ class SKIF15(raycing.BeamLine):
 
 
 
-def run_process(beamLine):
+def run_process(beamLine: SKIF15):
     wiggler01beamGlobal01 = beamLine.wiggler01.shine()
 
     rectangularAperture01beamLocal01 = beamLine.rectangularAperture01.propagate(
@@ -197,9 +191,6 @@ def run_process(beamLine):
         'screen01beamLocal01': screen01beamLocal01,
         'rectangularAperture02beamLocal01': rectangularAperture02beamLocal01}
     return outDict
-
-
-rrun.run_process = run_process
 
 
 def energy_allign(beam, en, de):

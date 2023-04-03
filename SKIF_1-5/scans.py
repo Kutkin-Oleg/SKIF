@@ -17,8 +17,8 @@ subdir = r"C:\Users\synchrotron\PycharmProjects\SKIF"
 
 def change_x(plts, bl):
     scan_name = 'change_x'
-    for x in np.arange(-40., 40., 1.):
-        bl.bentLaueCylinder01.center[1] = x
+    for x in np.arange(-10., 10., 1.):
+        bl.bentLaueCylinder01.center[0] = x
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
                                      plot.title + '_%s' % bl.bentLaueCylinder01.center[1] + '.png'
@@ -54,9 +54,9 @@ def define_plots( bl):
 
 def main():
     beamLine = SKIF15()
-    E0 = 150000
-    # energy_allign(beamLine, E0, 2000)
-    beamLine.align_energy(E0, 2000)
+    E0 = 30000
+    energy_allign(beamLine, E0, 2000)
+    # beamLine.align_energy(E0, 100)
     plots = define_plots(beamLine)
     scan=change_x
     xrtrun.run_ray_tracing(
@@ -68,9 +68,8 @@ def main():
         generatorArgs=[plots, beamLine]
         )
 
-
-    beamLine.glow()
-    # test_plot(beamLine, E0, 33.5)
+    #
+    # beamLine.glow()
 
 if __name__ == '__main__':
     main()
