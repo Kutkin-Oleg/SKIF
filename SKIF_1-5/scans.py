@@ -16,7 +16,7 @@ from SKIF_1_5 import SKIF15
 subdir = r"C:\Users\synchrotron\PycharmProjects\SKIF"
 
 def change_x(plts, bl):
-    scan_name = 'change_x'
+    scan_name = 'change-x'
     for x in np.arange(-10., 10., 1.):
         bl.bentLaueCylinder01.center[0] = x
         for plot in plts:
@@ -30,15 +30,15 @@ def change_x(plts, bl):
 def define_plots( bl):
     plots = []
 
-    scan_name = 'change_x'
+    scan_name = 'change-x'
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
 
-    plots.append(xrtplot.XYCPlot(beam='screen02beamLocal01', title='plot_04,04,2023',
+    plots.append(xrtplot.XYCPlot(beam='screen02beamLocal01', title='plot-04,04,2023',
                                  xaxis=xrtplot.XYCAxis(label='z', unit='mm', data=raycing.get_z),
                                  yaxis=xrtplot.XYCAxis(label='x', unit='mm', data=raycing.get_x),
-                                 aspect='auto', saveName='plot_03,04,2023.png'
+                                 aspect='auto', saveName='plot-03,04,2023.png'
                                   ))
     # plots[2].persistentName = 'z-z’.pickle'
     for plot in plots:
@@ -65,7 +65,6 @@ def main():
         generatorArgs=[plots, beamLine]
         )
 
-    beamLine.glow()
     # beamLine.glow()
 
 if __name__ == '__main__':
