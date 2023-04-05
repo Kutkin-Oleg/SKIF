@@ -16,7 +16,7 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-x"):
         temp, chan = file.split('_')
         chan=chan.replace('.0.pickle', '')
         x.append(int(chan))
-        tab.append(file.flux)
+        tab.append(g.flux)
 
 
 plt.plot(x, tab, '.')
