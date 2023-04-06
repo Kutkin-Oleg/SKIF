@@ -30,7 +30,7 @@ import pickle
 import os
 from params.source import ring_kwargs, wiggler_1_5_kwargs
 from params.params_1_5 import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
-    monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim
+    monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, exit_slit_distance
 
 
 crystalSi01 = CrystalSiPrecalc(
@@ -80,9 +80,13 @@ class SKIF15(raycing.BeamLine):
             center=[0, 33500, 0],
             alpha=np.radians(35.3),  # 35.3
             pitch=2.252849714,  # 2.252849714,
+            roll=0.,
+            yaw=0.,
             material=crystalSi01,
-            limOptX=[-1000.0, 1000.0],
-            limOptY=[-1000.0, 1000.0],
+            limPhysY=monochromator_y_lim,
+            limOptY=monochromator_y_lim,
+            limPhysX=monochromator_x_lim,
+            limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
             R=np.inf)
 
@@ -103,15 +107,17 @@ class SKIF15(raycing.BeamLine):
             positionRoll=np.pi,
             material=crystalSi02,
             alpha=np.radians(35.3),
-            limOptX=monochromator_x_lim,
+            limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
+            limPhysX=monochromator_x_lim,
+            limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
             R=30000)
 
         self.screen01 = rscreens.Screen(
             bl=self,
             name=r"Exit Monitor",
-            center=[0, monochromator_distance, .5 * monochromator_z_offset])
+            center=[0, exit_slit_distance - 10, .5 * monochromator_z_offset])
 
         self.rectangularAperture02 = rapts.RectangularAperture(
             bl=self,
