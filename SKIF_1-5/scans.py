@@ -54,7 +54,7 @@ def change_z(plts, bl):
 def change_pitch(plts, bl):
     scan_name = 'change-pitch'
     startP=bl.bentLaueCylinder01.pitch
-    for pitch in np.arange(-np.pi/180*5/1000, np.pi/180*5/1000, np.pi/180*0.2/1000):
+    for pitch in np.arange(-30.e-6, 30.e-6, 1.e-6):
         bl.bentLaueCylinder01.pitch= startP+pitch
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
