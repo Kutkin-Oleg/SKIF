@@ -54,7 +54,7 @@ def change_z(plts, bl):
 def change_pitch(plts, bl):
     scan_name = 'change-pitch'
     startP=bl.bentLaueCylinder01.pitch
-    for pitch in np.arange(-np.pi/180*3, np.pi/180*3, 0.5):
+    for pitch in np.arange(-np.pi/180*5/1000, np.pi/180*5/1000, np.pi/180*0.2/1000):
         bl.bentLaueCylinder01.pitch= startP+pitch
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -66,7 +66,7 @@ def change_pitch(plts, bl):
 def change_roll(plts, bl):
     scan_name = 'change-roll'
     startR=bl.bentLaueCylinder01.roll
-    for roll in np.arange(-np.pi/180*3, np.pi/180*3, 0.5):
+    for roll in np.arange(-np.pi/180*3, np.pi/180*3, np.pi/180*0.5):
         bl.bentLaueCylinder01.roll = startR+roll
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -77,7 +77,7 @@ def change_roll(plts, bl):
 def change_yaw(plts, bl):
     scan_name = 'change-yaw'
     startYaw=bl.bentLaueCylinder01.yaw
-    for yaw in np.arange(-np.pi/180*3, np.pi/180*3, 0.5):
+    for yaw in np.arange(-np.pi/180*3, np.pi/180*3, np.pi/180*0.5):
         bl.bentLaueCylinder01.yaw = startYaw+yaw
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -218,8 +218,8 @@ def main():
 
     beamLine.align_energy(E0, 100)
     beamLine.alignE = E0
-    plots = define_plots_z(beamLine)
-    scan=change_z
+    plots = define_plots_pitch(beamLine)
+    scan=change_pitch
     xrtrun.run_ray_tracing(
         plots=plots,
         backend=r"raycing",
