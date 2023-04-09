@@ -66,7 +66,7 @@ def change_pitch(plts, bl):
 def change_roll(plts, bl):
     scan_name = 'change-roll'
     startR=bl.bentLaueCylinder01.roll
-    for roll in np.arange(-np.pi/180*3, np.pi/180*3, np.pi/180*0.5):
+    for roll in np.arange(-1.e-6, 1.e-6, 1.e-7):
         bl.bentLaueCylinder01.roll = startR+roll
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -77,7 +77,7 @@ def change_roll(plts, bl):
 def change_yaw(plts, bl):
     scan_name = 'change-yaw'
     startYaw=bl.bentLaueCylinder01.yaw
-    for yaw in np.arange(-np.pi/180*3, np.pi/180*3, np.pi/180*0.5):
+    for yaw in np.arange(-1.e1, 1.e1, 1.e-1):
         bl.bentLaueCylinder01.yaw = startYaw+yaw
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -194,7 +194,7 @@ def define_plots_roll( bl):
 def define_plots_yaw( bl):
     plots = []
 
-    scan_name = 'change-roll'
+    scan_name = 'change-yaw'
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
@@ -218,8 +218,8 @@ def main():
 
     beamLine.align_energy(E0, 100)
     beamLine.alignE = E0
-    plots = define_plots_pitch(beamLine)
-    scan=change_pitch
+    plots = define_plots_yaw(beamLine)
+    scan=change_yaw
     xrtrun.run_ray_tracing(
         plots=plots,
         backend=r"raycing",
