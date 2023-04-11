@@ -18,7 +18,7 @@ subdir = r"C:\Users\synchrotron\PycharmProjects\SKIF"
 def change_x(plts, bl):
     scan_name = 'change-x'
     startX = bl.bentLaueCylinder01.center[0]
-    for x in np.arange(-20., 20., 1):
+    for x in np.arange(-200., 200., 10):
         bl.bentLaueCylinder01.center[0] = startX+x
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -30,7 +30,7 @@ def change_x(plts, bl):
 def change_y(plts, bl):
     scan_name = 'change-y'
     startY=bl.bentLaueCylinder01.center[1]
-    for y in np.arange(-20., 20., 1):
+    for y in np.arange(-200., 200., 10):
         bl.bentLaueCylinder01.center[1] = startY+y
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -74,7 +74,7 @@ def change_roll(plts, bl):
         yield
 def change_yaw(plts, bl):
     scan_name = 'change-yaw'
-    for yaw in np.arange(-50.e-3, 50.e-3, 10.e-3):
+    for yaw in np.arange(-40.e-3, 50.e-3, 5.e-3):
         bl.bentLaueCylinder01.extraYaw = yaw
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -215,8 +215,8 @@ def main():
 
     beamLine.align_energy(E0, 100)
     beamLine.alignE = E0
-    plots = define_plots_roll(beamLine)
-    scan=change_roll
+    plots = define_plots_x(beamLine)
+    scan=change_x
     xrtrun.run_ray_tracing(
         plots=plots,
         backend=r"raycing",
