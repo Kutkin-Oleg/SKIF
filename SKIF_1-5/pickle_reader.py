@@ -24,9 +24,12 @@ def func_S(x, a, b, c, d, e, f, g):
  return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + (e * x**5) + (f * x**6)+g
 
 def func_G(x, a, b, c, d):
- return np.exp(-0.5*((x-b)/c)**2)/(a*(2*np.pi)**2)+d
+ return np.exp(-0.5*((x-b)/c)**2)*a+d
 def func_P(x, l, k):
     return l**k / math.factorial(k) * np.exp(-l)
+
+def get_FWHM(c):
+ return 2*c*(2*np.log(2))**0.5
 
 
 
@@ -41,9 +44,10 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-x"):
 sp = plt.subplot(321)
 plt.plot(x, tabx, '.')
 
-popt, pcov = curve_fit(func_S, x, tabx)
+popt, pcov = curve_fit(func_G, x, tabx, p0=[max(tabx), sum(x*tabx)/sum(tabx), np.std(x), 0] )
 x_line = np.arange(min(x), max(x), 1)
-plt.plot(x_line, func_S(x_line, *popt), 'r-')
+plt.plot(x_line, func_G(x_line, *popt), 'r-')
+print('x_FWHM=%s'%get_FWHM( popt[2]))
 for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-y"):
     if file.endswith(".pickle"):
         g=pickle.load(open(os.path.join(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-y", file), 'rb'))
@@ -54,9 +58,10 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-y"):
 
 sp = plt.subplot(322)
 plt.plot(y, taby, '.')
-popt, pcov = curve_fit(func_S, y, taby)
+popt, pcov = curve_fit(func_G, y, taby, p0=[max(taby), sum(y*taby)/sum(taby), np.std(y), 0] ) #среднеквадр
 y_line = np.arange(min(y), max(y), 1)
-plt.plot(y_line, func_S(y_line, *popt), 'r-')
+plt.plot(y_line, func_G(y_line, *popt), 'r-')
+print('y_FWHM=%s'%get_FWHM( popt[2]))
 
 for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-z"):
     if file.endswith(".pickle"):
@@ -68,9 +73,10 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-z"):
 
 sp = plt.subplot(323)
 plt.plot(z, tabz, '.')
-popt, pcov = curve_fit(func_S, z, tabz)
+popt, pcov = curve_fit(func_G, z, tabz, p0=[max(tabz), sum(z*tabz)/sum(tabz), np.std(z), 0])
 z_line = np.arange(min(z), max(z), 1)
-plt.plot(z_line, func_S(z_line, *popt), 'r-')
+plt.plot(z_line, func_G(z_line, *popt), 'r-')
+print('z_FWHM=%s'%get_FWHM( popt[2]))
 
 for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-pitch"):
     if file.endswith(".pickle"):
@@ -82,9 +88,9 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-pitch"
 
 sp = plt.subplot(324)
 plt.plot(pitch, tabpitch, '.')
-popt, pcov = curve_fit(func_S, pitch, tabpitch)
+popt, pcov = curve_fit(func_G, pitch, tabpitch,p0=[max(tabpitch), sum(pitch*tabpitch)/sum(tabpitch), np.std(pitch), 0])
 pitch_line = np.arange(min(pitch), max(pitch), 1)
-plt.plot(pitch_line, func_S(pitch_line, *popt), 'r-')
+plt.plot(pitch_line, func_G(pitch_line, *popt), 'r-')
 
 for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-roll"):
     if file.endswith(".pickle"):
@@ -96,9 +102,9 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-roll")
 
 sp = plt.subplot(325)
 plt.plot(roll, tabroll, '.')
-popt, pcov = curve_fit(func_S, roll, tabroll)
+popt, pcov = curve_fit(func_G, roll, tabroll,p0=[max(tabroll), sum(roll*tabroll)/sum(tabroll), np.std(roll), 0])
 roll_line = np.arange(min(roll), max(roll), 1)
-plt.plot(roll_line, func_S(roll_line, *popt), 'r-')
+plt.plot(roll_line, func_G(roll_line, *popt), 'r-')
 
 for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-yaw"):
     if file.endswith(".pickle"):
@@ -110,8 +116,8 @@ for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-yaw"):
 
 sp = plt.subplot(326)
 plt.plot(yaw, tabyaw, '.')
-popt, pcov = curve_fit(func_G, yaw, tabyaw)
-yaw_line = np.arange(min(yaw), max(yaw), 1)
+popt, pcov = curve_fit(func_G, yaw, tabyaw, p0=[max(tabyaw), sum(yaw*tabyaw)/sum(tabyaw), np.std(yaw), 0])
+yaw_line = np.arange(min(yaw), max(yaw), 1, )
 plt.plot(yaw_line, func_G(yaw_line, *popt), 'r-')
 
 plt.show()

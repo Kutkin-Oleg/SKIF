@@ -112,12 +112,12 @@ class SKIF15(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            R=30000)
+            R=np.inf)
 
         self.screen01 = rscreens.Screen(
             bl=self,
             name=r"Exit Monitor",
-            center=[0, exit_slit_distance - 10, .5 * monochromator_z_offset])
+            center=[0, exit_slit_distance - 10,  monochromator_z_offset])
 
         self.rectangularAperture02 = rapts.RectangularAperture(
             bl=self,

@@ -53,35 +53,32 @@ def change_z(plts, bl):
 
 def change_pitch(plts, bl):
     scan_name = 'change-pitch'
-    startP=bl.bentLaueCylinder01.pitch
-    for pitch in np.arange(-30.e-6, 30.e-6, 1.e-6):
-        bl.bentLaueCylinder01.pitch= startP+pitch
+    for pitch in np.arange(-20.e-6, 20.e-6, 1.e-6):
+        bl.bentLaueCylinder01.extraPitch=pitch
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
-                                      plot.title +'_%s' % bl.bentLaueCylinder01.pitch + '.png'
+                                      plot.title +'_%s' % bl.bentLaueCylinder01.extraPitch + '.png'
                                      )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
         yield
 
 def change_roll(plts, bl):
     scan_name = 'change-roll'
-    startR=bl.bentLaueCylinder01.roll
-    for roll in np.arange(-1.e-6, 1.e-6, 1.e-7):
-        bl.bentLaueCylinder01.roll = startR+roll
+    for roll in np.arange(-20.e-3, 20.e-3, 1.e-3):
+        bl.bentLaueCylinder01.extraRoll = roll
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
-                                      plot.title +'_%s' % bl.bentLaueCylinder01.roll + '.png'
+                                      plot.title +'_%s' % bl.bentLaueCylinder01.extraRoll + '.png'
                                      )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
         yield
 def change_yaw(plts, bl):
     scan_name = 'change-yaw'
-    startYaw=bl.bentLaueCylinder01.yaw
-    for yaw in np.arange(-1.e1, 1.e1, 1.e-1):
-        bl.bentLaueCylinder01.yaw = startYaw+yaw
+    for yaw in np.arange(-50.e-3, 50.e-3, 10.e-3):
+        bl.bentLaueCylinder01.extraYaw = yaw
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
-                                      plot.title +'_%s' % bl.bentLaueCylinder01.yaw  + '.png'
+                                      plot.title +'_%s' % bl.bentLaueCylinder01.extraYaw  + '.png'
                                      )
             plot.persistentName = plot.saveName.replace('.png', '.pickle')
         yield
@@ -165,7 +162,7 @@ def define_plots_pitch( bl):
     # plots[2].persistentName = 'z-z’.pickle'
     for plot in plots:
         plot.saveName = os.path.join(subdir, scan_name,
-                                      plot.title + '-%sm' % bl.bentLaueCylinder01.pitch+ '.png'
+                                      plot.title + '-%sm' % bl.bentLaueCylinder01.extraPitch+ '.png'
                                      )
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
     return plots
@@ -186,7 +183,7 @@ def define_plots_roll( bl):
     # plots[2].persistentName = 'z-z’.pickle'
     for plot in plots:
         plot.saveName = os.path.join(subdir, scan_name,
-                                      plot.title + '-%sm' % bl.bentLaueCylinder01.roll+ '.png'
+                                      plot.title + '-%sm' % bl.bentLaueCylinder01.extraRoll+ '.png'
                                      )
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
     return plots
@@ -207,7 +204,7 @@ def define_plots_yaw( bl):
     # plots[2].persistentName = 'z-z’.pickle'
     for plot in plots:
         plot.saveName = os.path.join(subdir, scan_name,
-                                      plot.title + '-%sm' % bl.bentLaueCylinder01.yaw+ '.png'
+                                      plot.title + '-%sm' % bl.bentLaueCylinder01.extraYaw+ '.png'
                                      )
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
     return plots
@@ -218,8 +215,8 @@ def main():
 
     beamLine.align_energy(E0, 100)
     beamLine.alignE = E0
-    plots = define_plots_yaw(beamLine)
-    scan=change_yaw
+    plots = define_plots_roll(beamLine)
+    scan=change_roll
     xrtrun.run_ray_tracing(
         plots=plots,
         backend=r"raycing",
