@@ -21,12 +21,15 @@ tabyaw=np.array([],dtype='f')
 def func_S(x, a, b, c, d, e, f, g, h, i):
  return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + (e * x**5) + (f * x**6)+(g* x**7)+(h** x**6)+i
 
+def func_L(x, a, x0, y):
+ return a/(1+((x-x0)/y)**2)
+
 def func_G(x, a, b, c, d):
  return np.exp(-0.5*((x-b)/c)**2)*a+d
 
-
 def get_G_FWHM(c):
  return 2*c*(2*np.log(2))**0.5
+
 
 def get_FWHM(x, y, maxy):
     maxy=0.5*maxy
@@ -38,13 +41,13 @@ def get_FWHM(x, y, maxy):
 
     FWHM=0.
     for i in np.arange(round(len(x)/2), len(x), 1):
-        if (y[i] >= maxy*0.98) and (y[i] <= maxy*1.02):
+        if (y[i] >= maxy*0.99) and (y[i] <= maxy*1.01):
             FWHM=abs(x[i]-mid)
             # print('max1 = %s' % y[i])
             break
 
     for i in np.arange(round(len(x)/2), 0, -1):
-        if (y[i] >= maxy * 0.98) and (y[i] <= maxy * 1.02):
+        if (y[i] >= maxy * 0.99) and (y[i] <= maxy * 1.01):
             FWHM=(FWHM+abs(x[i]-mid))
             # print('max2 = %s' % y[i])
             break
@@ -84,14 +87,19 @@ plt.plot(x, tabx, '.')
 popt, pcov = curve_fit(func_G, x, tabx, p0=[max(tabx), sum(x*tabx)/sum(tabx), np.std(x), 0] )
 x_line = np.arange(min(x), max(x), 1)
 plt.plot(x_line, func_G(x_line, *popt), 'r-')
+poptL, pcovL = curve_fit(func_L, x, tabx, p0=[max(tabx), sum(x*tabx)/sum(tabx), 0.1])
+plt.plot(x_line, func_L(x_line, *poptL), '-')
+print('x_L_FWHM=%s' % (poptL[2]*2))
+
 y_line =[]
-line =np.arange(min(x), max(x), 0.5)
-for i in np.arange(0, len(line), 1):
-    y_line =np.append(y_line, lagrange(x, tabx, line[i]))
+line =np.arange(min(x), max(x), 0.1)
+print('x_L_(FWHM)=%s' % get_FWHM(line, func_L(line, *poptL), max(tabx)))
+print('x_G_(FWHM)=%s' % get_FWHM(line, func_G(line, *popt), max(tabx)))
+
 plt.ylim([0, 1.e13])
-plt.plot(line, y_line, 'g-')
+plt.plot(line, lagrange(x, tabx, line), 'g-')
 print('x_G_FWHM=%s' % get_G_FWHM(popt[2]))
-print('x_FWHM=%s' % get_FWHM(line, y_line, max(tabx)))
+print('x_FWHM=%s' % get_FWHM(line, lagrange(x, tabx, line), max(tabx)))
 
 for file in os.listdir(r"C:\Users\synchrotron\PycharmProjects\SKIF\change-y"):
     if file.endswith(".pickle"):
@@ -108,8 +116,13 @@ y_line = np.arange(min(y), max(y), 1)
 plt.plot(y_line, func_G(y_line, *popt), 'r-')
 print('y_G_FWHM=%s' % get_G_FWHM(popt[2]))
 
+
 y_line =[]
 line =np.arange(min(y), max(y), 0.5)
+for i in np.arange(0, len(line), 1):
+    y_line =np.append(y_line, func_G(line[i], *popt))
+print('y_G_(FWHM)=%s' % get_FWHM(line, y_line, max(taby)))
+y_line =[]
 for i in np.arange(0, len(line), 1):
     y_line =np.append(y_line, lagrange(y, taby, line[i]))
 plt.ylim([0, 1.e13])
@@ -134,6 +147,10 @@ print('z_G_FWHM=%s' % get_G_FWHM(popt[2]))
 y_line=[]
 line =np.arange(min(z), max(z), 0.1)
 for i in np.arange(0, len(line), 1):
+    y_line =np.append(y_line, func_G(line[i], *popt))
+print('z_G_(FWHM)=%s' % get_FWHM(line, y_line, max(tabz)))
+y_line =[]
+for i in np.arange(0, len(line), 1):
     y_line =np.append(y_line, lagrange(z, tabz, line[i]))
 plt.ylim([0, 1.e13])
 plt.plot(line, y_line, 'g-')
@@ -155,7 +172,12 @@ plt.plot(pitch_line, func_G(pitch_line, *popt), 'r-')
 print('pitch_G_FWHM=%s' % get_G_FWHM(popt[2]))
 
 y_line=[]
-line =np.arange(min(pitch), max(pitch), 1.e-6)
+line =np.arange(min(pitch), max(pitch), 0.1e-6)
+for i in np.arange(0, len(line), 1):
+    y_line =np.append(y_line, func_G(line[i], *popt))
+print('pitch_G_(FWHM)=%s' % get_FWHM(line, y_line, max(tabpitch)))
+
+y_line =[]
 for i in np.arange(0, len(line), 1):
     y_line =np.append(y_line, lagrange(pitch, tabpitch, line[i]))
 plt.ylim([0, 1.e13])
@@ -178,7 +200,11 @@ plt.plot(roll_line, func_G(roll_line, *popt), 'r-')
 print('roll_G_FWHM=%s' % get_G_FWHM(popt[2]))
 
 y_line=[]
-line =np.arange(min(roll), max(roll), 0.1e-3)
+line =np.arange(min(roll), max(roll), 0.01e-3)
+for i in np.arange(0, len(line), 1):
+    y_line =np.append(y_line, func_G(line[i], *popt))
+print('roll_G_(FWHM)=%s' % get_FWHM(line, y_line, max(tabroll)))
+y_line =[]
 for i in np.arange(0, len(line), 1):
     y_line =np.append(y_line, lagrange(roll, tabroll, line[i]))
 plt.ylim([0, 1.e13])
@@ -202,7 +228,12 @@ plt.plot(yaw_line, func_G(yaw_line, *popt), 'r-')
 print('yaw_G_FWHM=%s' % get_G_FWHM(popt[2]))
 
 y_line=[]
-line =np.arange(min(yaw), max(yaw), 1.e-3)
+line =np.arange(min(yaw), max(yaw), 0.1e-3)
+for i in np.arange(0, len(line), 1):
+    y_line =np.append(y_line, func_G(line[i], *popt))
+print('yaw_G_(FWHM)=%s' % get_FWHM(line, y_line, max(tabyaw)))
+y_line =[]
+
 for i in np.arange(0, len(line), 1):
     y_line =np.append(y_line, lagrange(yaw, tabyaw, line[i]))
 plt.ylim([0, 1.e13])
