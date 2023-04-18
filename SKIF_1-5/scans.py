@@ -1,15 +1,10 @@
-from typing import List
 import os
 import numpy as np
-import pandas as pd
-import pickle
 import matplotlib
 matplotlib.use('agg')
-
 import xrt.runner as xrtrun
 import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
-
 
 from SKIF_1_5 import SKIF15
 
@@ -30,7 +25,7 @@ def change_x(plts, bl):
 def change_y(plts, bl):
     scan_name = 'change-y'
     startY=bl.bentLaueCylinder01.center[1]
-    for y in np.arange(-200., 200., 10):
+    for y in np.arange(100., 160., 5):
         bl.bentLaueCylinder01.center[1] = startY+y
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -208,15 +203,82 @@ def define_plots_yaw( bl):
                                      )
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
     return plots
+def find_focus(plts, bl):
+    scan_name = 'focus-%s'%bl.bentLaueCylinder01.R
+    for y in np.arange(100., 350., 10.):
+        bl.screen01.center[1] = y*1000+bl.bentLaueCylinder01.center[1]
+        bl.rectangularAperture02.center[1] = bl.screen01.center[1]+100
+
+        for plot in plts:
+            plot.saveName = os.path.join(subdir, scan_name,
+                                      plot.title +'_%s' % y + '.png'
+                                     )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        yield
+def define_plots_y_focus( bl):
+    plots = []
+
+    scan_name = 'focus-%s'%bl.bentLaueCylinder01.R
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+
+    plots.append(xrtplot.XYCPlot(beam='screen01beamLocal01', title='plot-04,04,2023',
+                                 xaxis=xrtplot.XYCAxis(label='x', unit='mm', data=raycing.get_x),
+                                 yaxis=xrtplot.XYCAxis(label='z', unit='mm', data=raycing.get_z),
+                                 aspect='auto', saveName='plot-03,04,2023.png'
+                                  ))
+    # plots[2].persistentName = 'z-z’.pickle'
+    for plot in plots:
+        plot.saveName = os.path.join(subdir, scan_name,
+                                      plot.title + '-%sm' % bl.screen01.center[1] + '.png'
+                                     )
+        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+    return plots
+
+def change_r(plts, bl):
+    scan_name = 'change-r-%s'  % ((bl.wiggler01.eMax+bl.wiggler01.eMin)/2)
+    for r in np.arange(70000., 140000., 1000.):
+        bl.bentLaueCylinder01.R = r
+        for plot in plts:
+            plot.saveName = os.path.join(subdir, scan_name,
+                                     plot.title + '_%s' % bl.bentLaueCylinder01.R + '.png'
+                                     )
+            if r<0:
+                plot.saveName = os.path.join(subdir, scan_name,
+                                             plot.title + '!_%s' % bl.bentLaueCylinder01.R + '.png'
+                                             )
+            plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        yield
+
+
+def define_plots_change_r(bl):
+    plots = []
+    scan_name = 'change-r-%s' % ((bl.wiggler01.eMax+bl.wiggler01.eMin)/2)
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+
+    plots.append(xrtplot.XYCPlot(beam='screen02beamLocal01', title='MD-ZZpr',
+                                 xaxis=xrtplot.XYCAxis(label='z', unit='mm', data=raycing.get_z),
+                                 yaxis=xrtplot.XYCAxis(label=r'$z^{\prime}$', unit='', data=raycing.get_zprime),
+                                 aspect='auto', saveName='MD-ZZpr.png'
+                                  ))
+    for plot in plots:
+        plot.saveName = os.path.join(subdir, scan_name,
+                                     plot.title + '-%sm' % bl.bentLaueCylinder01.R + '.png'
+                                     )
+        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+    return plots
 
 def main():
     beamLine = SKIF15()
     E0 = 30000
-
-    beamLine.align_energy(E0, 100)
+    # beamLine.bentLaueCylinder01.R = -125000
+    beamLine.align_energy(E0, 1)
     beamLine.alignE = E0
-    plots = define_plots_x(beamLine)
-    scan=change_x
+    plots = define_plots_change_r(beamLine)
+    scan=change_r
     xrtrun.run_ray_tracing(
         plots=plots,
         backend=r"raycing",

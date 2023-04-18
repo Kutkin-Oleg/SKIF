@@ -7,8 +7,8 @@ from scipy.optimize import curve_fit
 
 
 
-def func_S(x, a, b, c, d, e, f, g, h, i):
- return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + (e * x**5) + (f * x**6)+(g* x**7)+(h** x**6)+i
+def func_S(x, a, b, c, d, e):
+ return (a * x) + (b * x**2) + (c * x**3) + d
 
 def func_L(x, a, x0, y,  d):
  return a/(1+((x-x0)/y)**2)+d
@@ -19,14 +19,11 @@ def func_G(x, a, b, c, d):
 def get_G_FWHM(c):
  return 2*c*(2*np.log(2))**0.5
 
-
-def get_FWHM(x, y, maxy):
-    maxy=0.5*maxy
+def get_FWHM(x, y):
+    maxy=0.5*max(y)
     # print('FW = %s' % maxy)
-    if min(x)<0:
-        mid=(abs(max(x))-abs(min(x)))/2
-    else:
-        mid=(abs(max(x))+abs(min(x)))/2
+
+    mid=(abs(max(x))+min(x))/2
 
     FWHM=0.
     for i in np.arange(round(len(x)/2), len(x), 1):
@@ -67,12 +64,15 @@ def get_plot(x, tabx, name, step, sp):
     popt, pcov = curve_fit(func_G, x, tabx, p0=[max(tabx), sum(x * tabx) / sum(tabx), np.std(x), 0])
     x_line = np.arange(min(x), max(x), step)
     poptL, pcovL = curve_fit(func_L, x, tabx, p0=[max(tabx), sum(x * tabx) / sum(tabx), step/1.e-2, 0])
+    poptS, pcovS = curve_fit(func_S, x, tabx, p0=[1,1, 1,1,0])
     line = np.arange(min(x), max(x), step/100)
+    hmfL = half_max_x(line*2, func_L(line, *poptL))
     print(f'{name}_Lor_ FWHM ={(poptL[2] * 2)}')
-    print(f'{name}_Lor_(FWHM)={get_FWHM(line, func_L(line, *poptL) , max(tabx))}' )
+    print(f'{name}_Lor_(FWHM)={get_FWHM(line, func_L(line, *poptL))}')
     print(f'{name}_Gau_ FWHM ={get_G_FWHM(popt[2])}')
-    print(f'{name}_Gau_(FWHM)={get_FWHM(line, func_G(line, *popt) , max(tabx))}')
-    print(f'{name}_Lag_(FWHM)={get_FWHM(line, lagrange(x, tabx, line), max(tabx))} \n')
+    print(f'{name}_Gau_(FWHM)={get_FWHM(line, func_G(line, *popt))}')
+    print(f'{name}_Lag_(FWHM)={get_FWHM(line, lagrange(x, tabx, line))} \n')
+    print(f'{name}_Lor_WEB_(FWHM)={hmfL[1] - hmfL[0]}\n')
     plt.ylim([0, 1.e13])
     sp.set_title(f'{name}')
     plt.plot(x, tabx, 'b.', label = 'ray tracing')
@@ -82,6 +82,17 @@ def get_plot(x, tabx, name, step, sp):
     plt.legend()
 
     return plt.plot
+
+def lin_interp(x, y, i, half):
+    return x[i] + (x[i+1] - x[i]) * ((half - y[i]) / (y[i+1] - y[i]))
+
+def half_max_x(x, y):
+    half = max(y)/2.0
+    signs = np.sign(np.add(y, -half))
+    zero_crossings = (signs[0:-2] != signs[1:-1])
+    zero_crossings_i = np.where(zero_crossings)[0]
+    return [lin_interp(x, y, zero_crossings_i[0], half),
+            lin_interp(x, y, zero_crossings_i[1], half)]
 
 
 x=np.array([],dtype='f')
