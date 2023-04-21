@@ -41,10 +41,10 @@ def get_line_kb(data, show=False):
 
 tab=[]
 Rc=[]
-E=30000
-for file in os.listdir(fr"C:\Users\synchrotron\PycharmProjects\SKIF\change-r-30000.0"):
+E=60000
+for file in os.listdir(fr"C:\Users\synchrotron\PycharmProjects\SKIF\change-r-%s.0"%E):
     if file.endswith(".pickle"):
-        g=pickle.load(open(os.path.join(fr"C:\Users\synchrotron\PycharmProjects\SKIF\change-r-30000.0", file), 'rb'))
+        g=pickle.load(open(os.path.join(fr"C:\Users\synchrotron\PycharmProjects\SKIF\change-r-%s.0"%E, file), 'rb'))
         el, chan = file.split('_')
         chan=chan.replace('.0.pickle', '' )
         Rc.append(int(chan)/1000)
@@ -54,6 +54,7 @@ for file in os.listdir(fr"C:\Users\synchrotron\PycharmProjects\SKIF\change-r-300
         fdist = -np.sign(k) * np.sqrt((1. / k) ** 2 + (b / k) ** 2)
         tab.append(fdist/1000)
 
+print(f'r={Rc[10]}, F={tab[10]}')
 L0=33.5
 # Rc = np.arange(-100., 100., 10.)
 # Rc=[ -100, -90, -80, -70, -60, -50, -40, -30, -20, 10, 20, 30, 40, 50, 60, 70, 80, 90,100,110,120,130,140]
@@ -64,6 +65,10 @@ fi_h = np.radians(35.3) - b
 plt.plot(Rc, tab, '.')
 Rd = np.arange(-150., 150, 0.2)
 plt.plot(Rd, -np.absolute(np.cos(fi_h))*L0*Rd/(2*L0-np.cos(fi_0)*Rd))
+# plt.plot(Rd, -np.absolute(np.cos(fi_h))*np.cos(fi_h)*L0*Rd/(L0*(np.cos(fi_h)-np.cos(fi_0))+Rd*np.cos(fi_0)**2))
+# fi_0 = np.radians(35.3) + b
+# fi_h = -np.radians(35.3) + b
+# plt.plot(Rd, np.sin(fi_h)*L0*Rd/(2*L0-np.sin(fi_0)*Rd))
 # plt.plot(Rd, -np.cos(fi_h)**2*np.cos(fi_h)*L0*Rd/((np.absolute(np.cos(fi_h))+np.cos(fi_0))*L0-np.cos(fi_0)**2*Rd))
 plt.title('расстояние до источника- {} м'.format(L0))
 plt.ylim([-500, 500])

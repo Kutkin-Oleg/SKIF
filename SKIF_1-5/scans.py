@@ -238,7 +238,7 @@ def define_plots_y_focus( bl):
 
 def change_r(plts, bl):
     scan_name = 'change-r-%s'  % ((bl.wiggler01.eMax+bl.wiggler01.eMin)/2)
-    for r in np.arange(70000., 140000., 1000.):
+    for r in np.arange(24000., 160000., 1000.):
         bl.bentLaueCylinder01.R = r
         for plot in plts:
             plot.saveName = os.path.join(subdir, scan_name,
@@ -271,20 +271,43 @@ def define_plots_change_r(bl):
         plot.persistentName = plot.saveName.replace('.png', '.pickle')
     return plots
 
+def define_plots_get_f(bl, R, f):
+    plots = []
+    bl.bentLaueCylinder01.R=R*1000
+    bl.bentLaueCylinder02.center=[1000, 33688, 1000]
+    bl.screen02.center=[bl.screen02.center[0], bl.bentLaueCylinder02.center[1]+f*1000, bl.screen02.center[2]]
+    scan_name = f'get_f-{ bl.bentLaueCylinder01.R}_d-{f}'
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+
+
+    plots.append(xrtplot.XYCPlot(beam='screen02beamLocal01', title='MD-ZZpr',
+                                 xaxis=xrtplot.XYCAxis(label='x', unit='mm', data=raycing.get_z),
+                                 yaxis=xrtplot.XYCAxis(label='z', unit='mm', data=raycing.get_zprime),
+                                 aspect='auto', saveName='MD-XZ.png'
+                                  ))
+    for plot in plots:
+        plot.saveName = os.path.join(subdir, scan_name,
+                                     plot.title + '-%sm'  %scan_name + '.png'
+                                     )
+        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+    return plots
+
 def main():
     beamLine = SKIF15()
-    E0 = 30000
+    E0 = 60000
     # beamLine.bentLaueCylinder01.R = -125000
-    beamLine.align_energy(E0, 1)
+    beamLine.align_energy(E0, 1000)
     beamLine.alignE = E0
-    plots = define_plots_change_r(beamLine)
-    scan=change_r
+    plots = define_plots_get_f(beamLine, 110, 148)
+    # scan=change_r
+    # generator=scan,
     xrtrun.run_ray_tracing(
         plots=plots,
         backend=r"raycing",
         repeats=2,
         beamLine=beamLine,
-        generator=scan,
+
         generatorArgs=[plots, beamLine]
         )
 
