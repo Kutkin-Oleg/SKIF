@@ -30,7 +30,7 @@ import pickle
 import os
 from params.source import ring_kwargs, wiggler_1_5_kwargs
 from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
-    monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, exit_slit_distance
+    monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim
 
 
 crystalSi01 = CrystalSiPrecalc(
@@ -48,7 +48,7 @@ crystalSi02 = CrystalSiPrecalc(
     name=r"cr2",
     useTT=True)
 
-class SKIF15(raycing.BeamLine):
+class SKIFNSTU(raycing.BeamLine):
     def __init__(self):
 
         raycing.BeamLine.__init__(self)
@@ -117,7 +117,7 @@ class SKIF15(raycing.BeamLine):
         self.screen01 = rscreens.Screen(
             bl=self,
             name=r"Exit Monitor",
-            center=[0, exit_slit_distance - 10,  monochromator_z_offset])
+            center=[0, 111500- 10,  monochromator_z_offset])
 
         self.rectangularAperture02 = rapts.RectangularAperture(
             bl=self,
@@ -145,7 +145,7 @@ class SKIF15(raycing.BeamLine):
 
 
 
-def run_process(beamLine: SKIF15):
+def run_process(beamLine: SKIFNSTU):
     wiggler01beamGlobal01 = beamLine.wiggler01.shine()
 
     rectangularAperture01beamLocal01 = beamLine.rectangularAperture01.propagate(

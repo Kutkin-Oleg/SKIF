@@ -299,7 +299,7 @@ def main():
     # beamLine.bentLaueCylinder01.R = -125000
     beamLine.align_energy(E0, 1000)
     beamLine.alignE = E0
-    plots = define_plots_get_f(beamLine, 110, 148)
+    plots = define_plots_get_f(beamLine, 110, 100)
     # scan=change_r
     # generator=scan,
     xrtrun.run_ray_tracing(
