@@ -1,13 +1,5 @@
 .idea
 database
 params
-change-x
-change-y
-change-z
-change-pitch
-change-roll
-change-yaw
-focus-55000
-focus-125000
-focus--125000
-change-r-30000.0
+scans
+results
