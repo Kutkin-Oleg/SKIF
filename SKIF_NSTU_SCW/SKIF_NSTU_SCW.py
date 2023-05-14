@@ -116,14 +116,19 @@ class SKIFNSTU(raycing.BeamLine):
 
         self.screen01 = rscreens.Screen(
             bl=self,
-            name=r"Exit Monitor",
-            center=[0, 111500- 10,  monochromator_z_offset])
+            name=r"Apper Monitor",
+            center=[0, 35500 - 10,  monochromator_z_offset])
 
         self.rectangularAperture02 = rapts.RectangularAperture(
             bl=self,
             name=r"Exit Slits",
-            center=[0, 111500, 25],
-            opening=[-107.5, 107.5, -10, 10])
+            center=[0, 35500, 25],
+            opening=[-107.5*100, 107.5*100, -10*100, 10*100])
+
+        self.screen03 = rscreens.Screen(
+            bl=self,
+            name=r"Exit Monitor",
+            center=[0, 36000, monochromator_z_offset])
 
 
 
@@ -166,6 +171,9 @@ def run_process(beamLine: SKIFNSTU):
     rectangularAperture02beamLocal01 = beamLine.rectangularAperture02.propagate(
         beam=bentLaueCylinder02beamGlobal01)
 
+    screen03beamLocal01 = beamLine.screen03.expose(
+        beam=bentLaueCylinder02beamGlobal01)
+
     beamLine.prepare_flow()
 
     outDict = {
@@ -177,7 +185,8 @@ def run_process(beamLine: SKIFNSTU):
         'bentLaueCylinder02beamGlobal01': bentLaueCylinder02beamGlobal01,
         'bentLaueCylinder02beamLocal01': bentLaueCylinder02beamLocal01,
         'screen01beamLocal01': screen01beamLocal01,
-        'rectangularAperture02beamLocal01': rectangularAperture02beamLocal01}
+        'rectangularAperture02beamLocal01': rectangularAperture02beamLocal01,
+        'screen03beamLocal01': screen03beamLocal01}
     return outDict
 
 
