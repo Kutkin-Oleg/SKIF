@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import minimize
 import os
+import scipy.io
 
 def get_line_kb(data, show=False):
     """
@@ -57,9 +58,9 @@ def find_scales(data, show=True):
 
 
 
-for file in os.listdir(fr"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\basic-plot"):
-    if file.endswith(".pickle"):
-        g=pickle.load(open(os.path.join(fr"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\basic-plot", file), 'rb'))
+for file in os.listdir(fr"C:\\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\change-screen--140000.0"):
+    if file.endswith(".mat"):
+        g=scipy.io.loadmat(open(os.path.join(fr"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\change-screen--140000.0", file), 'rb'))
         # find_scales(g)
         print(file)
 

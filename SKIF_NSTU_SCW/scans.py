@@ -8,7 +8,10 @@ import xrt.backends.raycing as raycing
 
 from SKIF_NSTU_SCW import SKIFNSTU
 
-subdir=r"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results"
+
+resol='mat'
+subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\{resol}"
+
 def define_plots(bl):
     plots = []
     scan_name = 'change-screen-%s'  % (bl.bentLaueCylinder01.R)
@@ -25,7 +28,7 @@ def define_plots(bl):
         plot.saveName = os.path.join(subdir, scan_name,
                                      plot.title + '-%sm' % bl.bentLaueCylinder01.R + '.png'
                                      )
-        plot.persistentName = plot.saveName.replace('.png', '.pickle')
+        plot.persistentName = plot.saveName.replace('.png', f'.{resol}')
     return plots
 
 def change_screen(plts, bl):
@@ -37,7 +40,7 @@ def change_screen(plts, bl):
             plot.saveName = os.path.join(subdir, scan_name,
                                      plot.title + '_%s' % bl.screen03.center[1] + '.png'
                                      )
-            plot.persistentName = plot.saveName.replace('.png', '.mat')
+            plot.persistentName = plot.saveName.replace('.png', f'.{resol}')
         yield
 
 def main():

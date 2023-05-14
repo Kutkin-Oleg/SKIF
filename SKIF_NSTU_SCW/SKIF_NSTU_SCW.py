@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 import xrt.backends.raycing.materials as rm
 import pickle
 import os
-from params.source import ring_kwargs, wiggler_1_5_kwargs
+from params.source import ring_kwargs, wiggler_nstu_scw_kwargs
 from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim
 
@@ -64,7 +64,7 @@ class SKIFNSTU(raycing.BeamLine):
             xPrimeMax=front_end_h_angle * .505e3,
             zPrimeMax=front_end_v_angle * .505e3,
             **ring_kwargs,
-            **wiggler_1_5_kwargs,
+            **wiggler_nstu_scw_kwargs,
 
         )
 
