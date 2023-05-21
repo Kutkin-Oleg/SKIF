@@ -33,10 +33,15 @@ def heat():
     true_power=data['power'][0][0]
     print(data)
 
-dir = f'C:\\Users\\synchrotron\\PycharmProjects\\SKIF\\SKIF_NSTU_SCW\\results\\mat'
-def find_spot(radius):
 
-    filename = f'C:\\Users\\synchrotron\\PycharmProjects\\SKIF\\SKIF_NSTU_SCW\\results\\mat\\change-screen-{radius}'
+radi=''
+E0 = 30000
+dir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\mat\{E0}\R-R"
+
+def find_spot(cat, show=False):
+    filename=dir+'\\'+cat
+    rad = cat.replace('change-screen-', '')
+
     min_x=10e3
     min_y=10e3
     distance=''
@@ -44,11 +49,7 @@ def find_spot(radius):
         if file.endswith(".mat"):
             data = scipy.io.loadmat(filename+'\\'+file)
 
-            # print(file)
-            # print(f"Размер по х-{data['dx']}")
-            # print(f"Размер по y-{data['dy']}")
-            # print(f"Размер пятна-{data['dx']*data['dy']}\n")
-            if (data['dx']*data['dy']<min_x*min_y):
+            if (float(data['dy'])<min_y):
                 min_x=data['dx']
                 min_y=data['dy']
                 distance=file
@@ -56,18 +57,43 @@ def find_spot(radius):
     data = scipy.io.loadmat(filename + '\\' + distance)
     tr, dist = distance.split('_')
     dist = dist.replace('.mat', '')
-    print(f'минимальный фокус при экране на {dist} от источника')
-    print(f"Размер по х-{data['dx']}")
-    print(f"Размер по y-{data['dy']}")
-    print(f"Размер пятна-{data['dx'] * data['dy']}\n")
-    return ([dist, data['dx'] * data['dy']])
+    if show:
+        print(f'изгиб {rad}')
+        print(f'минимальный фокус при экране на {dist} от источника')
+        print(f"Размер по х-{data['dx']}")
+        print(f"Размер по y-{data['dy']}")
+        print(f"Размер пятна-{data['dx'] * data['dy']}\n")
+    return ([float(rad), float(dist), float( data['dy'])])
 
 def graph_focus():
+    gra_data=[]
     for cat in os.listdir(dir):
-        print(cat)
+        if cat.startswith('change'):
+            gra_data.append(find_spot(cat))
+    # gra_data=[ радиус изгиба, расположение экрана где мин пятно, минимальное пятно]
+    x=[]
+    y=[]
+    z=[]
+    for i in np.arange(0 ,len(gra_data),1):
+        x.append(gra_data[i][0])
+        y.append(gra_data[i][1])
+        z.append(gra_data[i][2])
+
+    fig = px.scatter(x=x, y=y, title="фокусное расстояние от изгиба")
+    fig.update_layout(xaxis_title='Радиус изгиба',
+                   yaxis_title='Фокусное расстояние')
+    fig.show()
+    fig = px.scatter(x=x, y=z, title="мин пятно от изгиба" )
+    fig.update_layout(xaxis_title='Радиус изгиба',
+                   yaxis_title='Размер пятна')
+
+
+    fig.show()
+
+
 
 def main():
-
+    graph_focus()
     # radius = '-140000.0'
     # temp=find_spot(radius)
     # print(temp)

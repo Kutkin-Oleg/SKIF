@@ -7,14 +7,16 @@ import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
 
 from SKIF_NSTU_SCW import SKIFNSTU
-
+from utilits.xrt_tools import crystal_focus
 
 resol='mat'
-subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\{resol}"
+E0 = 30000
+subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\{resol}\{E0}\R-R"
+
 
 def define_plots(bl):
     plots = []
-    scan_name = 'change-screen-%s'  % (bl.bentLaueCylinder01.R)
+    scan_name = 'change-screen-%s'  % (bl.bentLaueCylinder02.R)
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
@@ -26,38 +28,66 @@ def define_plots(bl):
                                   ))
     for plot in plots:
         plot.saveName = os.path.join(subdir, scan_name,
-                                     plot.title + '-%sm' % bl.bentLaueCylinder01.R + '.png'
+                                     plot.title + '-%sm' % bl.bentLaueCylinder02.R + '.png'
                                      )
         plot.persistentName = plot.saveName.replace('.png', f'.{resol}')
     return plots
 
+def define_plots_diver(bl):
+    plots = []
+    scan_name = 'diver-screen-'
+    if not os.path.exists(os.path.join(subdir, scan_name)):
+        os.mkdir(os.path.join(subdir, scan_name))
+    plots.append(xrtplot.XYCPlot(beam='screen02beamLocal01', title=f'{scan_name}',
+                                 xaxis=xrtplot.XYCAxis(label='x', unit='mm', data=raycing.get_x),
+                                 yaxis=xrtplot.XYCAxis(label=r'$x^{\prime}$', unit='', data=raycing.get_xprime),
+                                 aspect='auto', saveName=f'{scan_name}_Sample-XX.png'
+                                 ))
+    for plot in plots:
+        plot.saveName = os.path.join(subdir,scan_name,
+                                     plot.title + '-%sm' % bl.bentLaueCylinder01.R + '.png'
+                                     )
+        plot.persistentName = plot.saveName.replace('.png', f'.pickle')
+    return plots
+
 def change_screen(plts, bl):
-    scan_name = 'change-screen-%s' % (bl.bentLaueCylinder01.R)
+    scan_name = 'change-screen-%s' % (bl.bentLaueCylinder02.R)
     d0=bl.screen03.center[1]
-    for dist in np.arange(0., 150000., 10000.):
+    for dist in np.linspace(-5000., -500., 50):
+
         bl.screen03.center[1]=d0+dist
         for plot in plts:
+            plot.xaxis.limits=None
+            plot.yaxis.limits = None
+            plot.caxis.limits = None
             plot.saveName = os.path.join(subdir, scan_name,
                                      plot.title + '_%s' % bl.screen03.center[1] + '.png'
                                      )
-            plot.persistentName = plot.saveName.replace('.png', f'.{resol}')
+            plot.persistentName = plot.saveName.replace('png', f'{resol}')
         yield
 
 def main():
     beamLine = SKIFNSTU()
+    diver=False
 
-
-
-    E0 = 60000
-    # beamLine.bentLaueCylinder01.R = -5000
-    dist0=beamLine.screen03.center[1]
-    beamLine.align_energy(E0, 10)
+    dist0=beamLine.bentLaueCylinder02 .center[1]
+    beamLine.align_energy(E0, 1000)
     beamLine.alignE = E0
-    for R in np.arange(-140000., 140000., 10000.):
+
+
+    for R in np.linspace(-2000., -500., 5):
         beamLine.bentLaueCylinder01.R = R
-        beamLine.bentLaueCylinder02.R = -R
+        beamLine.bentLaueCylinder02.R = R
         plots = define_plots(beamLine)
         scan = change_screen
+        if (diver==False):
+            beamLine.screen03.center[1] = dist0+crystal_focus(subdir +
+                                                    '\diver-screen-\diver-screen-' + '-%sm' % beamLine.bentLaueCylinder01.R + '.pickle')
+        if diver:
+            scan = None
+            plots = define_plots_diver(beamLine)
+
+
         xrtrun.run_ray_tracing(
             plots=plots,
             backend=r"raycing",
@@ -66,8 +96,7 @@ def main():
             generator=scan,
             generatorArgs=[plots, beamLine]
             )
-        beamLine.screen03.center[1]=dist0
-
+        beamLine.screen03.center[1]=dist0+10000
     beamLine.glow()
 
 if __name__ == '__main__':

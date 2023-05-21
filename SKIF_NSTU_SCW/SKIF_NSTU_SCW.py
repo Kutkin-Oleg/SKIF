@@ -33,17 +33,17 @@ from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim
 
 
-crystalSi01 = CrystalSiPrecalc(
+crystalSi01 = CrystalSiPrecalc(database='/Users/synchrotron/PycharmProjects/SKIF/database/Si111ref_sag.csv',
     hkl=(1, 1, 1),
-    t=2.,
+    t=0.5,
     geom=r"Laue reflection",
     name=r"cr1",
     useTT=True)
 
 
-crystalSi02 = CrystalSiPrecalc(
+crystalSi02 = CrystalSiPrecalc(database='/Users/synchrotron/PycharmProjects/SKIF/database/Si111ref_sag.csv',
     hkl=(1, 1, 1),
-    t=2.,
+    t=0.5,
     geom=r"Laue reflection",
     name=r"cr2",
     useTT=True)
