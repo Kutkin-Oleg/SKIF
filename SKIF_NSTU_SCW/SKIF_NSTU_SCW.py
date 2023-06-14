@@ -135,13 +135,13 @@ class SKIFNSTU(raycing.BeamLine):
     def align_energy(self, en, de):
         theta_b = np.arcsin(rm.ch / (2. * en * crystalSi01.d))
         print(theta_b)
-        self.bentLaueCylinder01.pitch = np.pi / 2 + theta_b + self.bentLaueCylinder02.alpha
         self.bentLaueCylinder01.alpha = np.radians(35.3)
+        self.bentLaueCylinder01.pitch = np.pi / 2 + theta_b + self.bentLaueCylinder02.alpha
         theta_b = np.arcsin(rm.ch / (2. * en * crystalSi02.d))
         delz = 25 / np.tan(2 * theta_b)
         self.bentLaueCylinder02.center = [0., 33500. + delz, 25.]
+        self.bentLaueCylinder02.alpha = np.radians(35.3)
         self.bentLaueCylinder02.pitch = np.pi / 2 - theta_b - self.bentLaueCylinder02.alpha
-        self.bentLaueCylinder02.alpha = -np.radians(35.3)
         self.screen02.center = [0., (33500. + 33500. + delz) * 0.5, 25. * 0.5]
         self.wiggler01.eMin = en - de / 2
         self.wiggler01.eMax = en + de / 2
