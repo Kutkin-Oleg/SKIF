@@ -16,7 +16,7 @@ subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\SKIF_NSTU_SCW\results\{resol
 
 def define_plots(bl):
     plots = []
-    scan_name = 'change-screen-%s'  % (bl.bentLaueCylinder02.R)
+    scan_name = 'change-screen-%s'  % (bl.bentLaueCylinder02.Rx)
     if not os.path.exists(os.path.join(subdir, scan_name)):
         os.mkdir(os.path.join(subdir, scan_name))
 
@@ -28,7 +28,7 @@ def define_plots(bl):
                                   ))
     for plot in plots:
         plot.saveName = os.path.join(subdir, scan_name,
-                                     plot.title + '-%sm' % bl.bentLaueCylinder02.R + '.png'
+                                     plot.title + '-%sm' % bl.bentLaueCylinder02.Rx + '.png'
                                      )
         plot.persistentName = plot.saveName.replace('.png', f'.{resol}')
     return plots
@@ -45,13 +45,13 @@ def define_plots_diver(bl):
                                  ))
     for plot in plots:
         plot.saveName = os.path.join(subdir,scan_name,
-                                     plot.title + '-%sm' % bl.bentLaueCylinder01.R + '.png'
+                                     plot.title + '-%sm' % bl.bentLaueCylinder01.Rx + '.png'
                                      )
         plot.persistentName = plot.saveName.replace('.png', f'.pickle')
     return plots
 
 def change_screen(plts, bl):
-    scan_name = 'change-screen-%s' % (bl.bentLaueCylinder02.R)
+    scan_name = 'change-screen-%s' % (bl.bentLaueCylinder02.Rx)
     d0=bl.screen03.center[1]
     for dist in np.linspace(-5000., -500., 50):
 
@@ -76,13 +76,13 @@ def main():
 
 
     for R in np.linspace(-2000., -500., 5):
-        beamLine.bentLaueCylinder01.R = R
-        beamLine.bentLaueCylinder02.R = R
+        beamLine.bentLaueCylinder01.Rx = R
+        beamLine.bentLaueCylinder02.Rx = R
         plots = define_plots(beamLine)
         scan = change_screen
         if (diver==False):
             beamLine.screen03.center[1] = dist0+crystal_focus(subdir +
-                                                    '\diver-screen-\diver-screen-' + '-%sm' % beamLine.bentLaueCylinder01.R + '.pickle')
+                                                    '\diver-screen-\diver-screen-' + '-%sm' % beamLine.bentLaueCylinder01.Rx + '.pickle')
         if diver:
             scan = None
             plots = define_plots_diver(beamLine)

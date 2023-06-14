@@ -23,7 +23,7 @@ import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 import xrt.backends.raycing.myopencl as mcl
 from database.CrystalSiPrecalc import CrystalSiPrecalc
-from database.BentLaueCylinder import BentLaueCylinder
+from database.BentLaueParaboloidWithBump import BentLaueParaboloidWithBump
 import matplotlib.pyplot as plt
 import xrt.backends.raycing.materials as rm
 import pickle
@@ -74,7 +74,7 @@ class SKIFNSTU(raycing.BeamLine):
             center=[0, front_end_distance, 0],
             opening=front_end_opening)
 
-        self.bentLaueCylinder01 = BentLaueCylinder(
+        self.bentLaueCylinder01 = BentLaueParaboloidWithBump(
             bl=self,
             name=r"Si[111] Crystal 1",
             center=[0, 33500, 0],
@@ -88,7 +88,7 @@ class SKIFNSTU(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            R=np.inf)
+            Rx=2000)
 
         self.bentLaueCylinder01.ucl = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
 
@@ -97,7 +97,7 @@ class SKIFNSTU(raycing.BeamLine):
             name=r"Crystal 1-2 Monitor",
             center=[0, monochromator_distance, monochromator_z_offset/2])
 
-        self.bentLaueCylinder02 = BentLaueCylinder(
+        self.bentLaueCylinder02 = BentLaueParaboloidWithBump(
             bl=self,
             name=r"Si[111] Crystal 2",
             center=[0, 33688, 25],
@@ -112,7 +112,7 @@ class SKIFNSTU(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            R=np.inf)
+            Rx=2000)
 
         self.screen01 = rscreens.Screen(
             bl=self,
