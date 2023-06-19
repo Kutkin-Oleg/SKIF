@@ -7,21 +7,6 @@ import numpy as np
 import pandas as pd
 
 def main():
-    path='C:\\Users\\synchrotron\\PycharmProjects\\SKIF\\database\\mirror_refl.csv'
-    # data = genfromtxt(path, delimiter=';', dtype=float)
-    #
-    # columns=['angle']
-    # angle=[]
-    # for i in np.arange(0, len(data), 1):
-    #     angle.append(f'{data[i, 0]} °')
-    # for i in np.arange(0, len(data[0])-1, 1):
-    #     columns.append(f'{(i+1)*1000} eV')
-    #
-    # df = pd.DataFrame(data=data, columns=columns,  index=angle)
-    # print(df)
-    # fig = px.imshow(df, aspect="auto", origin='lower')
-    # fig.show()
-
     path = 'C:\\Users\\synchrotron\\PycharmProjects\\SKIF\\database\\Si_refl.csv'
     data = genfromtxt(path, delimiter=f'\t', dtype=float)
     data_tabl = [[0] * 256 for i in range(256)]
@@ -31,11 +16,10 @@ def main():
     angle=[]
     N=256
     for i in np.arange(0, N, 1):
-        columns.append(f'{1000+25000/N*i}')
-        angle.append(f'{18 / N * i}')
+        columns.append(1000+25000/N*i)
+        angle.append(18 / N * i)
 
     df = pd.DataFrame(data=data_tabl, columns=columns,  index=angle)
-    print(df)
 
     fig = px.imshow(df, aspect="auto", origin='lower')
     fig.update_layout(xaxis_title='Энергия эВ',

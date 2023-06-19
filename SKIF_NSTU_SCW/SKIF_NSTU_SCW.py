@@ -88,33 +88,33 @@ class SKIFNSTU(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            Rx=2000,
-            Ry=2000 / 1.e-6)
+            Rx=-2000,
+            Ry=2000*1.e6)
 
         self.bentLaueCylinder01.ucl = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
 
-        self.screen02 = rscreens.Screen(
-            bl=self,
-            name=r"Crystal 1-2 Monitor",
-            center=[0, monochromator_distance, monochromator_z_offset/2])
-
         self.bentLaueCylinder02 = BentLaueParaboloidWithBump(
             bl=self,
-            name=r"Si[111] Crystal 2",
-            center=[0, 33688, 25],
-            positionRoll=np.pi,
-            pitch=0,
+            name=r"Si[111] Crystal 1",
+            center=[0, 33500, 25],
+            alpha=np.radians(-35.3),  # 35.3
+            pitch=np.pi / 2,  # 2.252849714,
             roll=0.,
             yaw=0.,
-            material=crystalSi02,
-            alpha=np.radians(35.3),
+            material=crystalSi01,
             limPhysY=monochromator_y_lim,
             limOptY=monochromator_y_lim,
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            Rx=2000,
-            Ry=2000/1.e-6)
+            Rx=-2000,
+            Ry=2000 * 1.e6)
+        self.screen02 = rscreens.Screen(
+            bl=self,
+            name=r"Crystal 1-2 Monitor",
+            center=[0, monochromator_distance, monochromator_z_offset/2])
+
+
 
         self.screen01 = rscreens.Screen(
             bl=self,
