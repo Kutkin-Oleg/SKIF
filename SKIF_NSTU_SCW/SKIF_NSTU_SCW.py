@@ -79,7 +79,7 @@ class SKIFNSTU(raycing.BeamLine):
             name=r"Si[111] Crystal 1",
             center=[0, 33500, 0],
             alpha=np.radians(35.3),  # 35.3
-            pitch=2.252849714,  # 2.252849714,
+            pitch=np.pi/2,  # 2.252849714,
             roll=0.,
             yaw=0.,
             material=crystalSi01,
@@ -88,7 +88,8 @@ class SKIFNSTU(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            Rx=2000)
+            Rx=2000,
+            Ry=2000 / 1.e-6)
 
         self.bentLaueCylinder01.ucl = mcl.XRT_CL(r'materials.cl', targetOpenCL='CPU')
 
@@ -101,10 +102,10 @@ class SKIFNSTU(raycing.BeamLine):
             bl=self,
             name=r"Si[111] Crystal 2",
             center=[0, 33688, 25],
-            pitch=2.120945392,
+            positionRoll=np.pi,
+            pitch=0,
             roll=0.,
             yaw=0.,
-            positionRoll=np.pi,
             material=crystalSi02,
             alpha=np.radians(35.3),
             limPhysY=monochromator_y_lim,
@@ -112,7 +113,8 @@ class SKIFNSTU(raycing.BeamLine):
             limPhysX=monochromator_x_lim,
             limOptX=monochromator_x_lim,
             targetOpenCL='CPU',
-            Rx=2000)
+            Rx=2000,
+            Ry=2000/1.e-6)
 
         self.screen01 = rscreens.Screen(
             bl=self,
@@ -140,8 +142,8 @@ class SKIFNSTU(raycing.BeamLine):
         theta_b = np.arcsin(rm.ch / (2. * en * crystalSi02.d))
         delz = 25 / np.tan(2 * theta_b)
         self.bentLaueCylinder02.center = [0., 33500. + delz, 25.]
-        self.bentLaueCylinder02.alpha = np.radians(35.3)
-        self.bentLaueCylinder02.pitch = np.pi / 2 - theta_b - self.bentLaueCylinder02.alpha
+        self.bentLaueCylinder02.alpha = np.radians(-35.3)
+        self.bentLaueCylinder02.pitch = np.pi / 2 - theta_b + self.bentLaueCylinder02.alpha
         self.screen02.center = [0., (33500. + 33500. + delz) * 0.5, 25. * 0.5]
         self.wiggler01.eMin = en - de / 2
         self.wiggler01.eMax = en + de / 2

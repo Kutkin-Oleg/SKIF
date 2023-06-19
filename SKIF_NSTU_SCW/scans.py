@@ -53,7 +53,7 @@ def define_plots_diver(bl):
 def change_screen(plts, bl):
     scan_name = 'change-screen-%s' % (bl.bentLaueCylinder02.Rx)
     d0=bl.screen03.center[1]
-    for dist in np.linspace(-5000., -500., 50):
+    for dist in np.linspace(-500., 500., 50):
 
         bl.screen03.center[1]=d0+dist
         for plot in plts:
@@ -75,28 +75,30 @@ def main():
     beamLine.alignE = E0
 
 
-    for R in np.linspace(-2000., -500., 5):
-        beamLine.bentLaueCylinder01.Rx = R
-        beamLine.bentLaueCylinder02.Rx = R
-        plots = define_plots(beamLine)
-        scan = change_screen
-        if (diver==False):
-            beamLine.screen03.center[1] = dist0+crystal_focus(subdir +
-                                                    '\diver-screen-\diver-screen-' + '-%sm' % beamLine.bentLaueCylinder01.Rx + '.pickle')
-        if diver:
-            scan = None
-            plots = define_plots_diver(beamLine)
-
-
-        xrtrun.run_ray_tracing(
-            plots=plots,
-            backend=r"raycing",
-            repeats=5,
-            beamLine=beamLine,
-            generator=scan,
-            generatorArgs=[plots, beamLine]
-            )
-        beamLine.screen03.center[1]=dist0+10000
+    # for R in np.linspace(-2000., -500., 5):
+    #     beamLine.bentLaueCylinder01.Rx = R
+    #     beamLine.bentLaueCylinder02.Rx = R
+    #     beamLine.bentLaueCylinder01.Ry = R/1.e6
+    #     beamLine.bentLaueCylinder02.Ry = R/1.e6
+    #     plots = define_plots(beamLine)
+    #     scan = change_screen
+    #     if (diver==False):
+    #         beamLine.screen03.center[1] = dist0+crystal_focus(subdir +
+    #                                                 '\diver-screen-\diver-screen-' + '-%sm' % beamLine.bentLaueCylinder01.Rx + '.pickle')
+    #     if diver:
+    #         scan = None
+    #         plots = define_plots_diver(beamLine)
+    #
+    #
+    #     xrtrun.run_ray_tracing(
+    #         plots=plots,
+    #         backend=r"raycing",
+    #         repeats=5,
+    #         beamLine=beamLine,
+    #         generator=scan,
+    #         generatorArgs=[plots, beamLine]
+    #         )
+    #     beamLine.screen03.center[1]=dist0+10000
     beamLine.glow()
 
 if __name__ == '__main__':
