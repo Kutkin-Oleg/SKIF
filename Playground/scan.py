@@ -7,15 +7,31 @@ import xrt.plotter as xrtplot
 import xrt.backends.raycing as raycing
 import scipy.io
 from SKIF_NSTU_LENSES import SKIFNSTU
+import xraydb
 from utilits.xrt_tools import crystal_focus
-
 resol='mat'
 E0 = 30000
 subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\Playground\results\{E0}\R-R"
 
 def change_lenses_par(filename, bl):
-    data=scipy.io.loadmat(filename)
-    print(data)
+    data = scipy.io.loadmat(filename)
+    div=float(data['dy'])
+    length=(10-bl.doubleParaboloidLens02.limPhysX[1]*2)*div
+    f=crystal_focus(subdir +'\diver-screen-\diver-screen-' + '-%sm' % bl.bentLaueCylinder01.Rx + '.pickle')
+    print(f)
+    bl.doubleParaboloidLens02.center[1]=length+bl.bentLaueCylinder02.center[1]
+    print(f'положение лииз {bl.doubleParaboloidLens02.center[1]}')
+    material = 'Be'
+    # density gr/sm^3
+    density = 1.848
+    # Focus length of lenses m
+    focus=length
+    # radius of curvation m
+    R = 0.5e-3
+    temp = xraydb.xray_delta_beta(material, density,E0)
+    N = round(R / (2 * temp[0] * focus))
+    print(f'количество линз  {N}')
+    bl.doubleParaboloidLens02.nCRL=N
     return ()
 
 
@@ -52,26 +68,15 @@ def define_plots_diver(bl):
         plot.saveName = os.path.join(subdir,scan_name,
                                      plot.title + '-%sm' % bl.bentLaueCylinder01.Rx + '.png'
                                      )
-        plot.persistentName = plot.saveName.replace('.png', f'.mat')
+        plot.persistentName = plot.saveName.replace('.png', f'.pickle')
     return plots
 
-def crystal_diver(plts, bl):
-    scan_name = 'change-screen-%s' % (bl.bentLaueCylinder02.Rx)
 
-
-    for plot in plts:
-        plot.xaxis.limits = None
-        plot.yaxis.limits = None
-        plot.caxis.limits = None
-        plot.saveName = os.path.join(subdir, scan_name,
-                                 plot.title + '_%s' % bl.screen01.center[1] + '.png'
-                                 )
-        plot.persistentName = plot.saveName.replace('png', f'{resol}')
 
 
 def main():
     beamLine = SKIFNSTU()
-    diver=True
+    diver=False
 
     dist0=beamLine.bentLaueCylinder02 .center[1]
     beamLine.align_energy(E0, 100)
@@ -83,7 +88,7 @@ def main():
 
 
 
-    for R in np.linspace(-2000., -500., 500):
+    for R in np.linspace(-500., -500., 1):
         beamLine.bentLaueCylinder01.Rx = R
         beamLine.bentLaueCylinder02.Rx = R
         beamLine.bentLaueCylinder01.Ry = -R*6
@@ -100,16 +105,17 @@ def main():
             plots = define_plots_diver(beamLine)
 
 
-        xrtrun.run_ray_tracing(
-            plots=plots,
-            backend=r"raycing",
-            repeats=5,
-            beamLine=beamLine,
-            generator=scan,
-            generatorArgs=[plots, beamLine]
-            )
+        # xrtrun.run_ray_tracing(
+        #     plots=plots,
+        #     backend=r"raycing",
+        #     repeats=5,
+        #     beamLine=beamLine,
+        #     generator=scan,
+        #     generatorArgs=[plots, beamLine]
+        #     )
+        beamLine.glow()
         beamLine.screen03.center[1]=dist0+10000
-    beamLine.glow()
+    # beamLine.glow()
 
 if __name__ == '__main__':
     main()
