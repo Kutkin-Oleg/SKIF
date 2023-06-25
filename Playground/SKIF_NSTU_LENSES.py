@@ -167,7 +167,7 @@ class SKIFNSTU(raycing.BeamLine):
             t=0.03,
             focus=0.25,
             zmax=0.5,
-            nCRL=70,
+            nCRL=160,
             targetOpenCL='CPU',)
 
         self.screen03 = rscreens.Screen(
