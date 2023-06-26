@@ -11,6 +11,8 @@ __date__ = "2023-06-19"
 
 import numpy as np
 import sys
+
+
 sys.path.append(r"C:\Users\synchrotron\AppData\Local\Programs\Python\Python310\lib\site-packages\xrt-1.4.0-py3.10.egg")
 import xrt.backends.raycing.sources as rsources
 import xrt.backends.raycing.screens as rscreens
@@ -70,28 +72,22 @@ class SKIFNSTU(raycing.BeamLine):
         raycing.BeamLine.__init__(self)
         self.name = r"SKIF_1_5"
 
-
-        self.source=rsources.GeometricSource(
+        self.OE_for_source = rapts.RectangularAperture(
             bl=self,
-            name=r'source',
+            name=r"OE_for_source",
+            center=[0, 0, 0],
+            opening=[-455 / 2, 455 / 2, -27 / 2, 27 / 2])
+
+
+        self.source=rsources.GaussianBeam(
+            bl=self,
+            name='source',
             center=(0, 0, 0),
-            nrays=100000,
-            distx='normal',
-            dx=0.455,
-            disty=None,
-            dy=0,
-            distz='normal',
-            dz=0.027,
-            distxprime='normal',
-            dxprime=2e-6,
-            distzprime='normal',
-            dzprime=0.2e-6,
+            w0=[0.455, 0.027],
             distE='flat',
-            energies=(29000.0, 31000),
+            energies=(29000, 31000),
             energyWeights=None,
             polarization='horizontal',
-            filamentBeam=False,
-            uniformRayDensity=False,
             pitch=0,
             yaw=0)
 
@@ -193,7 +189,13 @@ class SKIFNSTU(raycing.BeamLine):
 
 def run_process(beamLine: SKIFNSTU):
 
-    sourcebeamGlobal01 = beamLine.source.shine()
+
+    waveOnFSMg=beamLine.OE_for_source.prepare_wave(
+        prevOE=beamLine.OE_for_source,
+        nrays=100000,
+        rw=None)
+
+    sourcebeamGlobal01 = beamLine.source.shine(wave=waveOnFSMg)
 
     rectangularAperture01beamLocal01 = beamLine.rectangularAperture01.propagate(
         beam=sourcebeamGlobal01)
@@ -221,6 +223,7 @@ def run_process(beamLine: SKIFNSTU):
     beamLine.prepare_flow()
 
     outDict = {
+
         'source01beamGlobal01': sourcebeamGlobal01,
         'rectangularAperture01beamLocal01': rectangularAperture01beamLocal01,
         'bentLaueCylinder01beamGlobal01': bentLaueCylinder01beamGlobal01,

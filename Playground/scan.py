@@ -16,9 +16,9 @@ subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\Playground\results\{E0}\R-R"
 def change_lenses_par(filename, bl):
     data = scipy.io.loadmat(filename)
     div=float(data['dy'])
-    length=(10-bl.doubleParaboloidLens02.limPhysX[1]*2)*div
+    length=(bl.doubleParaboloidLens02.limPhysX[1]*2)*div
     f=crystal_focus(subdir +'\diver-screen-\diver-screen-' + '-%sm' % bl.bentLaueCylinder01.Rx + '.pickle')
-    print(f)
+    print(length)
     bl.doubleParaboloidLens02.center[1]=length+bl.bentLaueCylinder02.center[1]
     print(f'положение лииз {bl.doubleParaboloidLens02.center[1]}')
     material = 'Be'
@@ -31,7 +31,7 @@ def change_lenses_par(filename, bl):
     temp = xraydb.xray_delta_beta(material, density,E0)
     N = round(R / (2 * temp[0] * focus))
     print(f'количество линз  {N}')
-    bl.doubleParaboloidLens02.nCRL=N
+    # bl.doubleParaboloidLens02.nCRL=N
     return ()
 
 
