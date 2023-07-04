@@ -4,9 +4,9 @@ import scipy.constants as constant
 import scipy.special as special
 
 
-material='Be'
+material='C4H6O2'
 # density gr/sm^3
-density=1.848
+density=0.962
 # Energy of x-ray radiation eV
 energy=17000
 # Focus length of lenses m
@@ -27,10 +27,13 @@ temp=xraydb.xray_delta_beta(material, density, energy)
 
 # Attenuation coefficient 1/m
 mu=xraydb.material_mu(material, energy, density=density, kind='total')*100
-mu=0.507*100
-# mu=temp[1]*4*np.pi/len
-# mu=temp[2]*100
-
+# mu Be
+# mu=0.507*100
+# mu Al
+# mu=16.63*100
+# mu Ni
+# mu=492.757*100
+print(mu)
 N=round(R/(2*temp[0]*focus))
 w=R0**2/(2*R)
 ap=mu*N*w
@@ -39,8 +42,7 @@ Deff1=2*R0*((1-np.exp(-ap))/ap)**0.5
 
 Q0=k*temp[0]
 ap=mu*R0**2/(focus*temp[0])/4
-ap=-0.5*mu/(density*1000)*(np.pi*R0**2/focus)*(xraydb.atomic_mass(material)*1.66e-27/(6.02e23*2.82e-15*xraydb.f1_chantler(material, energy)*len**2*1.602e-19))
-print(xraydb.f1_chantler(material, energy))
+ap=mu*R0**2*N/(2*R)
 transmit=np.exp(-mu*N*d)*(1/(2*ap))*(1-np.exp(-2*ap))
 
 
@@ -53,17 +55,24 @@ damping=np.exp(-Q**2*roughness**2)
 v=temp[1]/temp[0]
 Deff3=(len*focus/(2*v))**0.5*special.erf((2*np.pi*v/(len*focus))**0.5*R0)
 
-Tc=R*np.exp(-mu*N*(R0**2/R+d))/(2*mu*N*R0**2)
+Tplanar=(R*np.exp(-mu*N*(R0**2/R+d)))/(2*mu*N*R0**2)
 
 Deff4=(2*R/(mu*N))**0.5
+
+f0=R/(2*N*temp[0])
+L=N*2*w
+f=f0*(L/f0)**0.5/np.sin((L/f0)**0.5)
 print(f'Декримент показателя преломления {material} равен {round(temp[0],9)}')
-print(f'При фокусе {focus} м. требуется {N} Линз')
+print(f'При задаваемом фокусе {focus} м. требуется {N} Линз')
+print(f'Фокусное расстояние {round(f0,3)} м')
+print(f'Фокусное расстояние в приближении толстой линзы {round(f,3)} м')
 print(f'Эффективная апертура Lengeler {round(Deff1*1000,3)} мм при радиусе кривизны {R*1000} мм')
 print(f'Эффективная апертура Lengeler с шероховатостью {round(Deff2*1000,3)} мм при радиусе кривизны {R*1000} мм')
 print(f'Эффективная апертура Kohn {round(Deff3*1000,3)} мм при радиусе кривизны {R*1000} мм')
 print(f'Толщина линзы {round(N*(2*w+d)*1000,3)} мм.')
 print(f'Затухание интенсивности  {round(damping,3)}')
 print(f'Коэффициент пропускания T  {round(transmit*100,3)} %')
-print(f'Коэффициент пропускания Tc  {round(Tc*100,3)} %')
+print(f'Коэффициент пропускания T planar  {round(Tplanar*100,3)} %')
 print(f'momentum transfer Q  {round(Q)}\n')
+
 

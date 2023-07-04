@@ -75,19 +75,19 @@ class SKIFNSTU(raycing.BeamLine):
         self.OE_for_source = rapts.RectangularAperture(
             bl=self,
             name=r"OE_for_source",
-            center=[0, 0, 0],
-            opening=[-455 / 2, 455 / 2, -27 / 2, 27 / 2])
+            center=[0, 1500, 0],
+            opening=[-1.5, 1.5, -0.15, 0.15])
 
 
         self.source=rsources.GaussianBeam(
             bl=self,
             name='source',
             center=(0, 0, 0),
-            w0=[0.455, 0.027],
+            w0=[4.133e-11/(np.pi*2e-3)*1000, 4.133e-11/(np.pi*0.2e-3)],
             distE='flat',
-            energies=(29000, 31000),
+            energies=(29990, 30010),
             energyWeights=None,
-            polarization='horizontal',
+            polarization='h',
             pitch=0,
             yaw=0)
 
@@ -157,8 +157,8 @@ class SKIFNSTU(raycing.BeamLine):
             center=[0, 20000, monochromator_z_offset],
             pitch=1.5707963267948966,
             material=Be,
-            limPhysX=[-1.3, 1.3],
-            limPhysY=[-1.3, 1.3],
+            limPhysX=[-1.39/2, 1.39/2],
+            limPhysY=[-1.39/2, 1.39/2],
             shape=r"round",
             t=0.03,
             focus=0.25,
@@ -169,7 +169,7 @@ class SKIFNSTU(raycing.BeamLine):
         self.screen03 = rscreens.Screen(
             bl=self,
             name=r"Exit Monitor",
-            center=[0, 25000, monochromator_z_offset])
+            center=[0, 60000, monochromator_z_offset])
 
 
 
@@ -191,7 +191,7 @@ def run_process(beamLine: SKIFNSTU):
 
 
     waveOnFSMg=beamLine.OE_for_source.prepare_wave(
-        prevOE=beamLine.OE_for_source,
+        prevOE=beamLine.source,
         nrays=100000,
         rw=None)
 

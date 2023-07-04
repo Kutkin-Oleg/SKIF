@@ -14,22 +14,22 @@ E0 = 30000
 subdir=rf"C:\Users\synchrotron\PycharmProjects\SKIF\Playground\results\{E0}\R-R"
 
 def change_lenses_par(filename, bl):
-    data = scipy.io.loadmat(filename)
-    div=float(data['dy'])
-    length=(bl.doubleParaboloidLens02.limPhysX[1]*2)*div
-    f=crystal_focus(subdir +'\diver-screen-\diver-screen-' + '-%sm' % bl.bentLaueCylinder01.Rx + '.pickle')
-    print(length)
-    bl.doubleParaboloidLens02.center[1]=length+bl.bentLaueCylinder02.center[1]
+    # data = scipy.io.loadmat(filename)
+    # div=float(data['dy'])
+    # length=(bl.doubleParaboloidLens02.limPhysX[1]*2)*div
+    # f=crystal_focus(subdir +'\diver-screen-\diver-screen-' + '-%sm' % bl.bentLaueCylinder01.Rx + '.pickle')
+    bl.doubleParaboloidLens02.center[1]=31000
     print(f'положение лииз {bl.doubleParaboloidLens02.center[1]}')
     material = 'Be'
     # density gr/sm^3
     density = 1.848
     # Focus length of lenses m
-    focus=length
+    focus=5000
     # radius of curvation m
     R = 0.5e-3
-    temp = xraydb.xray_delta_beta(material, density,E0)
+    temp = xraydb.xray_delta_beta(material, density, E0)
     N = round(R / (2 * temp[0] * focus))
+    N=500
     print(f'количество линз  {N}')
     # bl.doubleParaboloidLens02.nCRL=N
     return ()
@@ -88,7 +88,7 @@ def main():
 
 
 
-    for R in np.linspace(-500., -500., 1):
+    for R in np.linspace(-630., -630., 1):
         beamLine.bentLaueCylinder01.Rx = R
         beamLine.bentLaueCylinder02.Rx = R
         beamLine.bentLaueCylinder01.Ry = -R*6
