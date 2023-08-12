@@ -11,13 +11,16 @@ import xrt.backends.raycing as raycing
 import xrt.backends.raycing.oes as roe
 
 from database import CrystalSiPrecalc, BentLaueParaboloid, CrocLens
+from database.CrystalSiPrecalc import CrystalSiPrecalc
+from database.BentLaueParaboloid import BentLaueParaboloid
+from database.CrocLens import CrocLens
 from params.source import ring_kwargs, wiggler_nstu_scw_kwargs, wiggler_1_5_kwargs
 from params.params_NSTU_SCW import front_end_distance, front_end_opening, front_end_v_angle, front_end_h_angle, \
     filter_distance, diamond_filter_th, diamond_filter_N, sic_filter_th, sic_filter_N, \
     monochromator_distance, monochromator_z_offset, monochromator_x_lim, monochromator_y_lim, \
     croc_crl_distance, croc_crl_L, croc_crl_y_t, exit_slit_distance, crl_mask_distance
 
-
+BASE_DIR='C:/Users/synchrotron/PycharmProjects/SKIF'
 # ################################################# SETUP PARAMETERS ###################################################
 
 
@@ -33,9 +36,9 @@ monochromator_c2_thickness = .5
 
 
 cr_si_1 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c1_thickness,
-                           database=os.path.join(os.getenv('BASE_DIR'), 'components', 'Si111ref_sag.csv'))
+                           database=os.path.join(BASE_DIR, 'database', 'Si111ref_sag.csv'))
 cr_si_2 = CrystalSiPrecalc(hkl=(1, 1, 1), geom='Laue reflection', useTT=True, t=monochromator_c2_thickness,
-                           database=os.path.join(os.getenv('BASE_DIR'), 'components', 'Si111ref_sag.csv'))
+                           database=os.path.join(BASE_DIR, 'database', 'Si111ref_sag.csv'))
 mBeryllium = rm.Material('Be', rho=1.848, kind='lens')
 mAl = rm.Material('Al', rho=2.7, kind='lens')
 mDiamond = rm.Material('C', rho=3.5, kind='lens')
