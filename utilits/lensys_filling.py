@@ -7,7 +7,7 @@ import math
 
 R=0.05
 Step=600
-a=0.7
+a=0.2
 b=0.15
 
 xcircle=[]
@@ -50,23 +50,21 @@ for i in range(Step):
             xlens.append(xmap[i])
             ylens.append(ymap[j])
 
-
+plt.subplot(1, 2, 1)
 for i in range(len(xlens)):
     circle = matplotlib.patches.Circle((xlens[i], ylens[i]), radius=R, fill=True)
-    axes.add_patch(circle)
+    plt.gca ().add_artist (circle)
 
 
 xparab=parabola(ymap)
 plt.scatter(xlens, ylens, s=1, color='black')
 plt.plot(-xparab, ymap, color='r')
 plt.plot(xparab, ymap, color='r')
-plt.show()
+# plt.show()
 
 EdgesParabola=[]
 EdgesCircles=[]
 temp=0
-int1=0
-int2=0
 
 def circle(x, x0):
     return (R**2-(x-x0)**2)**0.5
@@ -79,21 +77,23 @@ def my_integrate(f,a,b,dx):
 
 
 for y in ymap:
-    EdgesParabola.append(ylim[1]*2/Step*parabola(y))
+    EdgesParabola.append(2*parabola(y))
     for ycircle in ylens:
         if (ycircle+R>=y) and (ycircle-R<=y):
-            temp+=2*(R**2-(y-ycircle)**2)**2
-    print(temp)
+            temp+=2*(R**2-(y-ycircle)**2)**0.5
+    print(f'{parabola(y)} {temp}')
     EdgesCircles.append(temp)
     temp=0
 
 
-EdgesCircles.append(0)
+# EdgesCircles.append(0)
 # EdgesParabola.append(0)
-EdgesParabola.append(ylim[1]*2/Step*parabola(ylim[1]))
-plt.stairs(ymap,EdgesParabola, orientation='vertical', fill=True, baseline=0)
-plt.stairs(ymap,EdgesCircles, orientation='vertical', fill=False, baseline=0)
-# plt.step(ymap, EdgesParabola)
+# EdgesParabola.append(ylim[1]*2/Step*parabola(ylim[1]))
+plt.subplot(1, 2, 2)
+# plt.stairs(ymap,EdgesParabola, orientation='vertical', fill=False, baseline=0)
+# plt.stairs(ymap,EdgesCircles, orientation='vertical', fill=False, baseline=0)
+plt.step( EdgesParabola, ymap)
+plt.step(EdgesCircles,ymap)
 plt.show()
 
 
