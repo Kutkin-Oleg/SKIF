@@ -6,7 +6,7 @@ from scipy import integrate
 import math
 
 R=0.05
-Step=100
+Step=600
 a=0.7
 b=0.15
 
@@ -71,15 +71,22 @@ int2=0
 def circle(x, x0):
     return (R**2-(x-x0)**2)**0.5
 
-integ=0
+
+def my_integrate(f,a,b,dx):
+    x=np.arange(a,b,dx)
+    y=f(x)
+    return (y.sum()-(y[0]+y[-1])/2.)*dx  # we are adding the a
+
+
 for y in ymap:
     EdgesParabola.append(ylim[1]*2/Step*parabola(y))
     for ycircle in ylens:
-        if (ycircle>y-R) or (ycircle<y+R+2*ylim[1]/Step):
-            integ= integrate.dblquad(lambda y0, x: 1, y, y+2*ylim[1]/Step, lambda x: -(R**2-(x-ycircle)**2)**0.5, lambda x: (R**2-(x-ycircle)**2)**0.5)
-            temp+=integ[0]
+        if (ycircle+R>=y) and (ycircle-R<=y):
+            temp+=2*(R**2-(y-ycircle)**2)**2
+    print(temp)
     EdgesCircles.append(temp)
     temp=0
+
 
 EdgesCircles.append(0)
 # EdgesParabola.append(0)
