@@ -3,7 +3,6 @@ import matplotlib.path
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
-import math
 
 R=0.05
 Step=600
@@ -22,6 +21,7 @@ plt.ylim(ylim)
 # plt.grid()
 axes = plt.gca()
 axes.set_aspect("equal")
+#границы параболы и центров окружностей
 xlim=[-2,2]
 ylim=[-2,2]
 xmap=np.linspace(xlim[0],xlim[1], Step)
@@ -35,6 +35,7 @@ def integrator(numx,numy):
     temp = integrate.quad(lambda x: (R**2+(x-xmap[numx])**2)**0.5, xlim[0], xlim[1])
     return (temp[0])
 
+#условие не пересечения окружностей
 def test(numx,numy):
     for i in range(len(xlens)):
         if ((xmap[numx]-xlens[i])**2+(ymap[numy]-ylens[i])**2)**0.5<2*R:
@@ -92,8 +93,8 @@ for y in ymap:
 plt.subplot(1, 2, 2)
 # plt.stairs(ymap,EdgesParabola, orientation='vertical', fill=False, baseline=0)
 # plt.stairs(ymap,EdgesCircles, orientation='vertical', fill=False, baseline=0)
-plt.step( EdgesParabola, ymap)
-plt.step(EdgesCircles,ymap)
+plt.step(EdgesParabola, ymap)
+plt.step(EdgesCircles, ymap)
 plt.show()
 
 
