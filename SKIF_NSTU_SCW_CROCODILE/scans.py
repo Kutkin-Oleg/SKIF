@@ -164,25 +164,25 @@ def e_scan(plts: List, bl: NSTU_SCW):
 
 if __name__ == '__main__':
     beamline = NSTU_SCW()
-    scan = e_scan
+    # scan = e_scan
     show = False
     repeats = 3
-
-    if show:
-        beamline.glow(
-            scale=[1e3, 1e3, 1e3],
-            centerAt=r'Si[111] Crystal 1',
-            generator=scan,
-            generatorArgs=[plots, beamline],
-            startFrom=1
-        )
-    else:
-        xrtrun.run_ray_tracing(
-            beamLine=beamline,
-            plots=plots,
-            repeats=repeats,
-            backend=r"raycing",
-            generator=scan,
-            generatorArgs=[plots, beamline]
-        )
+    beamline.glow()
+    # if show:
+    #     beamline.glow(
+    #         scale=[1e3, 1e3, 1e3],
+    #         centerAt=r'Si[111] Crystal 1',
+    #         generator=scan,
+    #         generatorArgs=[plots, beamline],
+    #         startFrom=1
+    #     )
+    # else:
+    #     xrtrun.run_ray_tracing(
+    #         beamLine=beamline,
+    #         plots=plots,
+    #         repeats=repeats,
+    #         backend=r"raycing",
+    #         generator=scan,
+    #         generatorArgs=[plots, beamline]
+    #     )
 

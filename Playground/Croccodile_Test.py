@@ -23,7 +23,7 @@ BASE_DIR = 'C:/Users/synchrotron/PycharmProjects/SKIF'
 # ################################################# SETUP PARAMETERS ###################################################
 
 """CrocLens"""
-croc_crl_distance=28000
+croc_crl_distance=27000
 croc_crl_L=270
 croc_crl_y_t=1.2
 alignment_energy = 30.e3
@@ -37,7 +37,7 @@ mBeryllium = rm.Material('Be', rho=1.848, kind='lens')
 mAl = rm.Material('Al', rho=2.7, kind='lens')
 mDiamond = rm.Material('C', rho=3.5, kind='lens')
 mGraphite = rm.Material('C', rho=2.15, kind='lens')
-lens_material = mGraphite
+lens_material = mBeryllium
 
 
 # #################################################### BEAMLINE ########################################################
@@ -54,7 +54,7 @@ class NSTU_SCW(raycing.BeamLine):
             bl=self,
             name='',
             center=(0, 0, 0),
-            nrays=100000,
+            nrays=10000,
             distx='normal',
             dx=0.455/2.355,
             disty=None,
@@ -62,9 +62,9 @@ class NSTU_SCW(raycing.BeamLine):
             distz='normal',
             dz=0.027/2.355,
             distxprime='flat',
-            dxprime=2.0,
+            dxprime=[0, 2.e-6],
             distzprime='flat',
-            dzprime=0.2,
+            dzprime=[0, 0.2e-6],
             distE='flat',
             energies=(alignment_energy-1, alignment_energy+1),
             energyWeights=None,
@@ -74,6 +74,10 @@ class NSTU_SCW(raycing.BeamLine):
             pitch=0,
             yaw=0
         )
+
+
+
+
 
         self.FrontEnd = rapts.RectangularAperture(
             bl=self,
@@ -103,10 +107,19 @@ class NSTU_SCW(raycing.BeamLine):
         self.Screen = rscreens.Screen(
             bl=self,
             name=r"Screen",
-            center=[0, 56000, 0],
+            center=[0, 42000, 0],
         )
 
+    def print_positions(self):
+        print('#' * 20, self.name, '#' * 20)
 
+        for element in (self.SuperCWiggler, self.FrontEnd,
+                         self.Screen):
+            print('#' * 5, element.name, 'at', element.center)
+
+
+
+        print('#' * (42 + len(self.name)))
 
 
 
@@ -139,12 +152,12 @@ class NSTU_SCW(raycing.BeamLine):
         self.CrlMask.opening = [-100., 100., -apt / 2., apt / 2.]
         print('Croc Lens: g_r = %.01f, g_l = %.01f, y_t = %.01f, L = %.01f' % (g_r, g_l, croc_crl_y_t, croc_crl_L))
         print('Mask: %.01f' % apt)
-
+        self.print_positions()
 # ################################################# BEAM TOPOLOGY ######################################################
 
 
 def run_process(bl: NSTU_SCW):
-    beam_source = bl.sources[0].shine()
+    beam_source = bl.SuperCWiggler.shine()
 
     beam_ap1 = bl.FrontEnd.propagate(
         beam=beam_source
@@ -154,9 +167,7 @@ def run_process(bl: NSTU_SCW):
         'BeamSourceGlobal': beam_source,
         'BeamAperture1Local': beam_ap1,
     }
-
-    beamIn = beam_ap1
-
+    beamIn = beam_source
 
     # Pre-CRL mask
     outDict['BeamAperture2Local'] = bl.CrlMask.propagate(
@@ -177,8 +188,9 @@ def run_process(bl: NSTU_SCW):
         beamIn = lglobal
 
     ScreenLocal01 = bl.Screen.expose(
-        beam=beamIn)
-    outDict['screenLocal01']= ScreenLocal01
+        beam=beamIn
+    )
+    outDict['ScreenLocal01']= ScreenLocal01
 
     bl.prepare_flow()
 

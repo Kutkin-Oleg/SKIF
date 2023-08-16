@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
 
-R=0.05
-Step=600
-a=0.2
-b=0.15
+R=0.2
+Step=300
+a=1
+b=0.3
 
 xcircle=[]
 ycircle=[]
@@ -45,14 +45,29 @@ def test(numx,numy):
 def parabola(x):
     return a*x**2+b
 
+def volume_test(testy):
+    Vtemp= 2 * R
+    for ycircle in ylens:
+        if (ycircle + R > testy) and (ycircle - R < testy):
+            Vtemp += 2 * (R ** 2 - (testy- ycircle) ** 2) ** 0.5
+    testS = 2 * parabola(testy) - Vtemp
+    return(abs(testS))
+
+S=1e12
+testS=[S for x in range(Step)]
 for i in range(Step):
     for j in range(Step):
-        if test(i,j) and (xmap[i]<=parabola(ymap[j])) and (xmap[i]>=-parabola(ymap[j])):
+        tempS=volume_test(ymap[j])
+        # if test(i,j) and (xmap[i]<=parabola(ymap[j])) and (xmap[i]>=-parabola(ymap[j])):
+        if test(i, j)  and (tempS < testS[j]) and (xmap[i]<=parabola(ymap[j])) and (xmap[i]>=-parabola(ymap[j])):
             xlens.append(xmap[i])
             ylens.append(ymap[j])
-
+            testS[j]=tempS
+    # S=1.e12
+print(S)
 plt.subplot(1, 2, 1)
 for i in range(len(xlens)):
+    plt.text(xlens[i], ylens[i], f"{i}", fontsize=5)
     circle = matplotlib.patches.Circle((xlens[i], ylens[i]), radius=R, fill=True)
     plt.gca ().add_artist (circle)
 
