@@ -23,7 +23,7 @@ BASE_DIR = 'C:/Users/synchrotron/PycharmProjects/SKIF'
 # ################################################# SETUP PARAMETERS ###################################################
 
 """CrocLens"""
-croc_crl_distance=27000
+croc_crl_distance=28000
 croc_crl_L=270
 croc_crl_y_t=1.2
 alignment_energy = 30.e3
@@ -62,9 +62,9 @@ class NSTU_SCW(raycing.BeamLine):
             distz='normal',
             dz=0.027/2.355,
             distxprime='flat',
-            dxprime=[0, 2.e-6],
+            dxprime=[-1.e-6, 1.e-6],
             distzprime='flat',
-            dzprime=[0, 0.2e-6],
+            dzprime=[-0.1e-6, 0.1e-6],
             distE='flat',
             energies=(alignment_energy-1, alignment_energy+1),
             energyWeights=None,
@@ -109,6 +109,11 @@ class NSTU_SCW(raycing.BeamLine):
             name=r"Screen",
             center=[0, 42000, 0],
         )
+        self.Screen_free = rscreens.Screen(
+            bl=self,
+            name=r"Screen_free",
+            center=[0, 42000, 0],
+        )
 
     def print_positions(self):
         print('#' * 20, self.name, '#' * 20)
@@ -133,13 +138,13 @@ class NSTU_SCW(raycing.BeamLine):
 
         # re-making the CRL
         del self.CrocLensStack[:]
-        if invert_croc:
-            g_l, g_r = CrocLens.calc_y_g(lens_material, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L), 0
-        else:
-            g_l, g_r = 0, CrocLens.calc_y_g(lens_material, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L)
+        # if invert_croc:
+        #     g_l, g_r = CrocLens.calc_y_g(lens_material, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L), 0
+        # else:
+        #     g_l, g_r = 0, CrocLens.calc_y_g(lens_material, croc_crl_distance / 2., en, croc_crl_y_t, croc_crl_L)
 
         self.CrocLensStack = CrocLens.make_stack(
-            L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_left=g_l, g_right=g_r,
+            L=croc_crl_L, N=int(croc_crl_L), d=croc_crl_y_t, g_left=0, g_right=croc_crl_y_t,
             bl=self,
             center=[0., croc_crl_distance, 0],
             material=lens_material,
@@ -150,25 +155,29 @@ class NSTU_SCW(raycing.BeamLine):
         # setting up pre-CRL mask
         apt = CrocLens.calc_optimal_params(lens_material, croc_crl_distance / 2., en)['Aperture']
         self.CrlMask.opening = [-100., 100., -apt / 2., apt / 2.]
-        print('Croc Lens: g_r = %.01f, g_l = %.01f, y_t = %.01f, L = %.01f' % (g_r, g_l, croc_crl_y_t, croc_crl_L))
+        print('Croc Lens: g_r = %.01f, g_l = %.01f, y_t = %.01f, L = %.01f' % (croc_crl_y_t, 0, croc_crl_y_t, croc_crl_L))
         print('Mask: %.01f' % apt)
         self.print_positions()
 # ################################################# BEAM TOPOLOGY ######################################################
 
 
 def run_process(bl: NSTU_SCW):
-    beam_source = bl.SuperCWiggler.shine()
+    BeamSourceGlobal = bl.SuperCWiggler.shine()
 
     beam_ap1 = bl.FrontEnd.propagate(
-        beam=beam_source
+        beam=BeamSourceGlobal
     )
 
     outDict = {
-        'BeamSourceGlobal': beam_source,
+        'BeamSourceGlobal': BeamSourceGlobal,
         'BeamAperture1Local': beam_ap1,
     }
-    beamIn = beam_source
+    beamIn = BeamSourceGlobal
 
+    Screen_freeLocal01 = bl.Screen_free.expose(
+        beam=beamIn
+    )
+    outDict['Screen_freeLocal01'] = Screen_freeLocal01
     # Pre-CRL mask
     outDict['BeamAperture2Local'] = bl.CrlMask.propagate(
         beam=beamIn
