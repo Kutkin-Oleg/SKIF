@@ -50,32 +50,45 @@ class NSTU_SCW(raycing.BeamLine):
         self.name = "NSTU SCW"
         self.alignE = alignment_energy
 
-        self.SuperCWiggler = rsources.GeometricSource(
+        self.SuperCWiggler = rsources.Wiggler(
+            name=r"",
             bl=self,
-            name='',
-            center=(0, 0, 0),
             nrays=10000,
-            distx='normal',
-            dx=0.455/2.355,
-            disty=None,
-            dy=0,
-            distz='normal',
-            dz=0.027/2.355,
-            distxprime='flat',
-            dxprime=[-1.e-6, 1.e-6],
-            distzprime='flat',
-            dzprime=[-0.1e-6, 0.1e-6],
-            distE='flat',
-            energies=(alignment_energy-1, alignment_energy+1),
-            energyWeights=None,
-            polarization='horizontal',
-            filamentBeam=False,
-            uniformRayDensity=False,
-            pitch=0,
-            yaw=0
+            center=[0, 0, 0],
+            eMin=29990,
+            eMax=30010,
+            xPrimeMax=front_end_h_angle * .505e3,
+            zPrimeMax=front_end_v_angle * .505e3,
+            **ring_kwargs,
+            # **wiggler_nstu_scw_kwargs
+            **wiggler_1_5_kwargs
         )
 
 
+        # self.SuperCWiggler = rsources.GeometricSource(
+        #     bl=self,
+        #     name='',
+        #     center=(0, 0, 0),
+        #     nrays=10000,
+        #     distx='normal',
+        #     dx=0.455/2.355,
+        #     disty=None,
+        #     dy=0,
+        #     distz='normal',
+        #     dz=0.027/2.355,
+        #     distxprime='flat',
+        #     dxprime=[-1.e-6, 1.e-6],
+        #     distzprime='flat',
+        #     dzprime=[-0.1e-6, 0.1e-6],
+        #     distE='flat',
+        #     energies=(alignment_energy-1, alignment_energy+1),
+        #     energyWeights=None,
+        #     polarization='horizontal',
+        #     filamentBeam=False,
+        #     uniformRayDensity=False,
+        #     pitch=0,
+        #     yaw=0
+        # )
 
 
 
@@ -112,7 +125,7 @@ class NSTU_SCW(raycing.BeamLine):
         self.Screen_free = rscreens.Screen(
             bl=self,
             name=r"Screen_free",
-            center=[0, 42000, 0],
+            center=[0, 28000, 0],
         )
 
     def print_positions(self):
@@ -132,9 +145,13 @@ class NSTU_SCW(raycing.BeamLine):
         # changing energy for the beamline / source
         self.alignE = en
         if not mono:
-            self.SuperCWiggler.energies = (en * (1 - d_en), en * (1 + d_en))
+            # self.SuperCWiggler.energies = (en * (1 - d_en), en * (1 + d_en))
+            self.SuperCWiggler.eMin = en * (1. - d_en)
+            self.SuperCWiggler.eMax = en * (1. + d_en)
         else:
-            self.SuperCWiggler.energies = (en - 1, en + 1)
+            # self.SuperCWiggler.energies = (en - 1, en + 1)
+            self.SuperCWiggler.eMin = en - 1.
+            self.SuperCWiggler.eMax = en + 1.
 
         # re-making the CRL
         del self.CrocLensStack[:]

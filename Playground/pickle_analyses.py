@@ -44,7 +44,7 @@ for En in os.listdir(subdir):
     focusFormula.append(yt ** 2 / (L * delta))
     tabx.append(minx)
     focusLen.append(minLen-28)
-    focusDiff.append(yt ** 2 / (L * delta)-minLen+28)
+    focusDiff.append(abs(yt ** 2 / (L * delta)-minLen+28))
     minx=1.e3
 print(focusEn)
 print(focusLen)

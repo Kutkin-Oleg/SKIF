@@ -3,12 +3,17 @@ import matplotlib.path
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator
+
+
 
 R=0.1
 Step=100
-a=0.1
+Rparab=2.5
 b=0.3
-tet=45/180*np.pi
+tet=63.42/180*np.pi
+a=1/(4*Rparab)
 
 xcircle=[]
 ycircle=[]
@@ -19,8 +24,8 @@ ylens=[]
 axes = plt.gca()
 axes.set_aspect("equal")
 #границы параболы и центров окружностей
-xlim=[0,15]
-ylim=[0,15]
+xlim=[0,20]
+ylim=[0,20]
 # xmap=np.linspace(xlim[0],xlim[1], Step)
 # ymap=np.linspace(ylim[0],ylim[1], Step)
 xmap=np.arange(xlim[0],xlim[1], 2*R)
@@ -47,6 +52,7 @@ def test(numx,numy):
 
 middle=(((ylim[1]-ylim[0])**2+(xlim[1]-xlim[0])**2)**0.5*np.sin(tet+np.arctan(xlim[1]/ylim[1])))/2
 def parabola(x):
+    a = 1 / (4 * Rparab)
     return a*(x-middle)**2+b
 
 def volume_test(testy):
@@ -119,6 +125,8 @@ def create_list_circle():
             tempy=(r * np.sin(fi+tet))
             # if test(xmap[i],ymap[j]+R*eventest) and (xmap[i]<=parabola(ymap[j]+R*eventest)) and (xmap[i]>=-parabola(ymap[j]+R*eventest)):
             if  (tempx <= parabola(tempy)) and (tempx >= -parabola(tempy)) and (tempy<=middle+4) and (tempy>=middle-4):
+            # if (tempx <= 2*parabola(tempy)) and (tempx >=0) and (tempy <= middle + 4) and (
+            #             tempy >= middle - 4):
             # if True:
             # if  test(tempx,tempy) and (volume_test_v1_2(tempy)) :
                 xlens.append(tempx)
@@ -188,7 +196,13 @@ def standDev(EdgesCircles, EdgesParabola):
     sumDev=0
     for i in range(len(EdgesCircles)):
         sumDev+=(EdgesCircles[i]-EdgesParabola[i])**2
-    return (sumDev**0.5/len(EdgesCircles))
+    return ((sumDev/len(EdgesCircles))**0.5)
+
+def linearDev(EdgesCircles, EdgesParabola):
+    sumDev=0
+    for i in range(len(EdgesCircles)):
+        sumDev+=abs(EdgesCircles[i]-EdgesParabola[i])
+    return ((sumDev/len(EdgesCircles)))
 
 
 EdgesParabola, EdgesCircles, EdgesDifferrence=second_plot()
@@ -202,59 +216,91 @@ plt.step(EdgesParabola, ymap)
 # plt.step(testS, ymap)
 # plt.step(EdgesDifferrence, ymap)
 plt.step(EdgesCircles, ymap)
+plt.title('радиус параболы %.2f'%(Rparab))
 plt.show()
 
 
 
 
 deviation=[]
-angle=[]
+linDev=[]
+angle=np.linspace(0, np.pi/4, 10)
+dev2D=[]
+linDev2D=[]
+parabRadMap=np.linspace(1, 10, 10)
 
-for tempangle in np.linspace(0, np.pi/2, 1000):
-    xmap = np.arange(xlim[0], xlim[1], 2 * R)
-    ymap = np.arange(ylim[0], ylim[1], 2 * R)
-    xcircle = []
-    ycircle = []
-    xlens = []
-    ylens = []
-    tet=tempangle
-    xlens, ylens=create_list_circle()
-    # xmap = np.linspace(min(xlens), max(xlens), 10000)
-    # ymap = np.linspace(min(ylens), max(ylens), 10000)
-    EdgesParabola, EdgesCircles, EdgesDifferrence = second_plot()
-    tempdev=standDev(EdgesCircles, EdgesParabola)
-    deviation.append(tempdev)
-    angle.append(tempangle*180/np.pi)
+for temprad in parabRadMap:
+    Rparab=temprad
+    for tempangle in angle:
+        xmap = np.arange(xlim[0], xlim[1], 2 * R)
+        ymap = np.arange(ylim[0], ylim[1], 2 * R)
+        xcircle = []
+        ycircle = []
+        xlens = []
+        ylens = []
+        tet=tempangle
+        xlens, ylens=create_list_circle()
+        xmap = np.linspace(min(xlens), max(xlens), 10000)
+        ymap = np.linspace(min(ylens), max(ylens), 10000)
+        EdgesParabola, EdgesCircles, EdgesDifferrence = second_plot()
+        tempdev=standDev(EdgesCircles, EdgesParabola)
+        deviation.append(tempdev)
+        linDev.append(linearDev(EdgesCircles, EdgesParabola))
 
 
+        if False:
+            plt.subplot(1, 2, 1)
+            for i in range(len(xlens)):
+                # plt.text(xlens[i], ylens[i], f"{i}", fontsize=5)
+                circle = matplotlib.patches.Circle((xlens[i], ylens[i]), radius=R, fill=True)
+                plt.gca().add_artist(circle)
+            xparab = parabola(np.linspace(min(ylens), max(ylens), len(xlens)))
+            plt.scatter(xlens, ylens, s=1, color='black')
+            plt.plot(-xparab, np.linspace(min(ylens), max(ylens), len(ylens)), color='r')
+            plt.plot(xparab, np.linspace(min(ylens), max(ylens), len(ylens)), color='r')
+            plt.title('угол наклона %.2f°' % (tet * 180 / np.pi))
+            # plt.show()
 
-
+            # EdgesParabola, EdgesCircles, EdgesDifferrence = second_plot()
+            plt.subplot(1, 2, 2)
+            plt.step(EdgesParabola, ymap)
+            plt.step(EdgesCircles, ymap)
+            plt.title('Среднеквадратическое отклонение  %.3f' % tempdev)
+            plt.show()
+        xcircle = []
+        ycircle = []
+        # print(deviation)
     if False:
-        plt.subplot(1, 2, 1)
-        for i in range(len(xlens)):
-            # plt.text(xlens[i], ylens[i], f"{i}", fontsize=5)
-            circle = matplotlib.patches.Circle((xlens[i], ylens[i]), radius=R, fill=True)
-            plt.gca().add_artist(circle)
-        xparab = parabola(np.linspace(min(ylens), max(ylens), len(xlens)))
-        plt.scatter(xlens, ylens, s=1, color='black')
-        plt.plot(-xparab, np.linspace(min(ylens), max(ylens), len(ylens)), color='r')
-        plt.plot(xparab, np.linspace(min(ylens), max(ylens), len(ylens)), color='r')
-        plt.title('угол наклона %.2f°' % (tet * 180 / np.pi))
-        # plt.show()
-
-        # EdgesParabola, EdgesCircles, EdgesDifferrence = second_plot()
-        plt.subplot(1, 2, 2)
-        plt.step(EdgesParabola, ymap)
-        plt.step(EdgesCircles, ymap)
-        plt.title('Среднеквадратическое отклонение  %.3f' % tempdev)
+        plt.plot(angle, deviation)
+        plt.ylabel('Среднеквадратичное отклонение')
+        plt.xlabel('Угол')
         plt.show()
-    xcircle = []
-    ycircle = []
-    # print(deviation)
-plt.plot(angle, deviation)
-plt.ylabel('Среднеквадратичное отклонение')
-plt.xlabel('Угол')
+        plt.plot(angle, linDev)
+        plt.ylabel('Среднее линейное отклонение')
+        plt.xlabel('Угол')
+        plt.show()
+    dev2D.append(deviation)
+    linDev2D.append(linDev)
+    print(f'При радиусе параболы {Rparab}')
+    for i in range(len(deviation)):
+        if deviation[i] == min(deviation):
+            print(f'при угле {angle[i]} минимальное среднеквадратичное отклонение {min(deviation)}')
+    for i in range(len(linDev)):
+        if linDev[i] == min(linDev):
+            print(f'при угле {angle[i]} минимальное среднее линейное отклонение {min(linDev)}\n')
+    deviation=[]
+    linDev=[]
+
+# print(dev2D)
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+X, Y = np.meshgrid(angle, parabRadMap)
+Z = np.array(dev2D)
+surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+
+ax.set_xlabel('Угол')
+ax.set_ylabel('Радиус параболы')
+ax.set_zlabel('Среднеквадратичное отклонение')
 plt.show()
-for i in range(len(deviation)):
-    if deviation[i]==min(deviation):
-        print(f'при угле {angle[i]} минимальное отклонение {min(deviation)}')
+
