@@ -224,10 +224,10 @@ plt.show()
 
 deviation=[]
 linDev=[]
-angle=np.linspace(0, np.pi/4, 10)
+angle=np.linspace(0, np.pi/4, 101)
 dev2D=[]
 linDev2D=[]
-parabRadMap=np.linspace(1, 10, 10)
+parabRadMap=np.linspace(1, 10, 101)
 
 for temprad in parabRadMap:
     Rparab=temprad
@@ -240,8 +240,8 @@ for temprad in parabRadMap:
         ylens = []
         tet=tempangle
         xlens, ylens=create_list_circle()
-        xmap = np.linspace(min(xlens), max(xlens), 10000)
-        ymap = np.linspace(min(ylens), max(ylens), 10000)
+        xmap = np.linspace(min(xlens), max(xlens), 1000)
+        ymap = np.linspace(min(ylens), max(ylens), 1000)
         EdgesParabola, EdgesCircles, EdgesDifferrence = second_plot()
         tempdev=standDev(EdgesCircles, EdgesParabola)
         deviation.append(tempdev)
@@ -270,7 +270,7 @@ for temprad in parabRadMap:
         xcircle = []
         ycircle = []
         # print(deviation)
-    if False:
+    if True:
         plt.plot(angle, deviation)
         plt.ylabel('Среднеквадратичное отклонение')
         plt.xlabel('Угол')
@@ -284,10 +284,10 @@ for temprad in parabRadMap:
     print(f'При радиусе параболы {Rparab}')
     for i in range(len(deviation)):
         if deviation[i] == min(deviation):
-            print(f'при угле {angle[i]} минимальное среднеквадратичное отклонение {min(deviation)}')
+            print(f'при угле {angle[i]* 180 / np.pi} минимальное среднеквадратичное отклонение {min(deviation)}')
     for i in range(len(linDev)):
         if linDev[i] == min(linDev):
-            print(f'при угле {angle[i]} минимальное среднее линейное отклонение {min(linDev)}\n')
+            print(f'при угле {angle[i]* 180 / np.pi} минимальное среднее линейное отклонение {min(linDev)}\n')
     deviation=[]
     linDev=[]
 
@@ -298,9 +298,21 @@ Z = np.array(dev2D)
 surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
                        linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=0.5, aspect=5)
-
+print(Z)
 ax.set_xlabel('Угол')
 ax.set_ylabel('Радиус параболы')
 ax.set_zlabel('Среднеквадратичное отклонение')
+plt.show()
+
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+X, Y = np.meshgrid(angle, parabRadMap)
+Z = np.array(linDev2D)
+surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+print(Z)
+ax.set_xlabel('Угол')
+ax.set_ylabel('Радиус параболы')
+ax.set_zlabel('Среднее линейное отклонение')
 plt.show()
 
