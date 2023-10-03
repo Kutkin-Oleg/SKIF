@@ -51,7 +51,7 @@ print(focusLen)
 print(focusFormula)
 
 plt.grid()
-plt.plot(focusEn, focusLen, label='Результат моделирование')
+plt.plot(focusEn, focusLen,  label='Результат моделирование')
 plt.plot(focusEn, focusFormula, label='Расчет по формуле')
 plt.plot(focusEn, focusDiff, label='Разность')
 plt.ylabel('Lh - расстояние до фокуса, м')
