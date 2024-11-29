@@ -229,6 +229,8 @@ def empty_scan(bl: CrocTestBL, plots: List):
     print('Gain %.01f' % ((focus_flux * source_projection) / (source_flux * focus_size)))
 
 del_focus=[]
+analit_g_t=[]
+model_g_t=[]
 def yg_scan(bl: CrocTestBL, plots: List):
     focal_dist=14000
     def slice_parabola(a, b, c, m):
@@ -240,6 +242,7 @@ def yg_scan(bl: CrocTestBL, plots: List):
         x2 = (-b + d) / (2. * c)
         return x0, x1, x2
     newG=round(focal_dist *crl_L/crl_y_t*np.real(1. - crl_mat.get_refractive_index(en)),3)
+    analit_g_t.append(newG)
     bl.reset_LensStack(newG)
     # ymin, ymax = 2.1 *focal_dist, 6. * focal_dist
 
@@ -290,7 +293,7 @@ def yg_scan(bl: CrocTestBL, plots: List):
         ax = fig.add_subplot()
         ax.plot(pos, y_size)
         ax.plot(pos, pp(pos))
-        ax.set_xlabel("E , eV")
+        ax.set_xlabel("z , мм")
         ax.set_ylabel("y_size, мм")
         ax.plot([realfocus, realfocus], [y_size.min(), y_size.max()], '--')
         ax.text(realfocus, y_size.max(), 'F=%.01f mm' % realfocus)
@@ -298,16 +301,16 @@ def yg_scan(bl: CrocTestBL, plots: List):
         fig.savefig(os.path.join(data_dir, '..', f'crl_y_g {newG} {en}eV_fdist%d.png' % _))
         print(f'Energy {en} эВ')
         print(f'newG {newG} мм')
-        print(f'del_focus={del_focus[_]} мм')
-        print(f'abs(focal_dist-real_focus)/focal_dist={abs(del_focus[_]) / (4*focal_dist)}')
-        if abs(del_focus[_]/(4*focal_dist))<=0.01:
+        print(f'del_focus={round(del_focus[-1],3)} мм')
+        print(f'abs(focal_dist-real_focus)/focal_dist={round(abs(del_focus[-1]) / (4*focal_dist),3)}')
+        if round(abs(del_focus[-1]/(4*focal_dist)),3)<=0.01:
 
             break
 
         # ymin, ymax = realfocus - 2 * (abs(del_focus[_])), realfocus - 2 * (abs(del_focus[_]))
         newG=round(newG*(1+(del_focus[_])/(4*focal_dist)),3)
         bl.reset_LensStack(newG)
-
+    model_g_t.append(newG)
     focus_dict.append(realfocus)
     print(f' Фокусное расстояние {focal_dist}мм при {en} еВ и y_g={newG} мм')
     # calculating gain
@@ -329,6 +332,7 @@ def yg_scan(bl: CrocTestBL, plots: List):
 
 if __name__ == '__main__':
     Emap = np.linspace(20000, 80000, 10)
+    Emap=[30000,50000,70000,90000]
     crl_y_t_map = np.linspace(0.5, 5, 10)
     focus_formula = []
     for tempE in Emap:
@@ -387,3 +391,11 @@ if __name__ == '__main__':
     ax.plot(Emap, [56000 for i in range(len(Emap))], label='analitic')
     ax.legend()
     fig.savefig(os.path.join(data_dir, '..', 'focus(E ).png'))
+    fig = mpl.pyplot.figure()
+    ax = fig.add_subplot()
+    ax.set_xlabel("E , eV")
+    ax.set_ylabel("y_g, мм")
+    ax.plot(Emap, analit_g_t, '-', label='analitic')
+    ax.plot(Emap, model_g_t, 'x', label='tracing')
+    ax.legend()
+    fig.savefig(os.path.join(data_dir, '..', 'g_t(E).png'))
